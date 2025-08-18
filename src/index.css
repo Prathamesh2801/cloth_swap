@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bebas-neue-regular {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.bungee-regular {
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.hexagon-shape {
+  clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+}
+
+.open-sans-regular {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.open-sans-medium {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 500;
+}
+
+.roboto-regular {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+}
+.roboto-medium {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+}
+
+.lato-regular {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+}
+.lato-semibold {
+  font-family: "Lato", sans-serif;
+  font-weight: 600;
+}
+
+.source-sans-pro-regular {
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 400;
+}
+.source-sans-pro-semibold {
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 600;
+}
+
+.merriweather-regular {
+  font-family: "Merriweather", serif;
+  font-weight: 400;
+}
+.merriweather-medium {
+  font-family: "Merriweather", serif;
+  font-weight: 500;
+}
