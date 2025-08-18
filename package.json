@@ -13,6 +13,7 @@
     "@gsap/react": "^2.1.2",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
+    "ag-grid-react": "^34.1.1",
     "axios": "^1.11.0",
     "framer-motion": "^12.23.6",
     "gsap": "^3.13.0",

@@ -1,20 +1,30 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Home, Users, Store, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import ShopManage from './Shop/ShopManage'
 
-const navigation = [
-    { name: 'Dashboard', href: '#', icon: Home, current: true },
-    { name: 'Users', href: '#', icon: Users, current: false },
-    { name: 'Shop', href: '#', icon: Store, current: false },
-]
+
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export default function Dashboard() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const queryParams = new URLSearchParams(location.search);
+    const activeTab = queryParams.get("tab") || "dashboard";
+
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false)
+
+
+    const navigation = [
+        { name: 'Dashboard', href: '#/sa/dashboard?tab=dashboard', icon: Home, current: activeTab === "dashboard" },
+        { name: 'Users', href: '#/sa/dashboard?tab=users', icon: Users, current: activeTab === "users" },
+        { name: 'Shop', href: '#/sa/dashboard?tab=shop', icon: Store, current: activeTab === "shop" },
+    ];
 
     const sidebarVariants = {
         open: {
@@ -106,6 +116,19 @@ export default function Dashboard() {
         }
     }
 
+    const renderContent = () => {
+        switch (activeTab) {
+            case "dashboard":
+                return <div>Dashboard Overview</div>;
+            case "users":
+                return <div>USER SECTION</div>;
+            case "shop":
+                return <ShopManage />;
+            default:
+                return <div>Dashboard Overview</div>;
+        }
+    };
+
     return (
         <>
             <div>
@@ -121,7 +144,7 @@ export default function Dashboard() {
                                 className="fixed inset-0 bg-gray-900/80 z-40 lg:hidden"
                                 onClick={() => setSidebarOpen(false)}
                             />
-                            
+
                             <motion.div
                                 initial="closed"
                                 animate="open"
@@ -154,8 +177,8 @@ export default function Dashboard() {
                                                 <motion.li
                                                     key={item.name}
                                                     initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ 
-                                                        opacity: 1, 
+                                                    animate={{
+                                                        opacity: 1,
                                                         x: 0,
                                                         transition: { delay: index * 0.1 }
                                                     }}
@@ -220,7 +243,7 @@ export default function Dashboard() {
                                     />
                                 )}
                             </AnimatePresence>
-                            
+
                             <motion.button
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
@@ -278,7 +301,7 @@ export default function Dashboard() {
                                         ))}
                                     </ul>
                                 </li>
-                                
+
                                 {/* User profile */}
                                 <li className={classNames(
                                     "mt-auto",
@@ -289,7 +312,7 @@ export default function Dashboard() {
                                         whileHover={{ scale: 1.02 }}
                                         className={classNames(
                                             "flex items-center gap-x-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors rounded-md",
-                                            desktopSidebarCollapsed ? "justify-center px-2" : "px-6"
+                                            desktopSidebarCollapsed ? "justify-center " : "px-6"
                                         )}
                                         title={desktopSidebarCollapsed ? "Tom Cook" : undefined}
                                     >
@@ -327,11 +350,11 @@ export default function Dashboard() {
                     >
                         <Menu className="h-6 w-6" />
                     </motion.button>
-                    
+
                     <div className="flex-1 text-sm font-semibold text-white">
                         Dashboard
                     </div>
-                    
+
                     <a href="#" className="rounded-full">
                         <img
                             alt="Profile"
@@ -344,11 +367,11 @@ export default function Dashboard() {
                 {/* Main content */}
                 <motion.main
                     variants={mainContentVariants}
-                    
-                    className="lg:ml-72"
-                >
-                    
+                    className={`transition-all duration-300 ease-in-out ${!desktopSidebarCollapsed ? "lg:pl-72" : "lg:pl-0"
+                        }`}>
+                    {renderContent()}
                 </motion.main>
+
             </div>
         </>
     )

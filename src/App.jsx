@@ -9,6 +9,7 @@ import Login from "./components/SuperAdmin/Login";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./components/SuperAdmin/Dashboard/Dashboard";
 import ProtectedSARoutes from "./routes/ProtectedSARoutes";
+import ShopManage from "./components/SuperAdmin/Dashboard/Shop/ShopManage";
 
 // If you have a NotFound or fallback component you can add it, otherwise fallback to Startup.
 
@@ -26,7 +27,7 @@ export default function App() {
         <Route path="/camera" element={<CameraSection />} />
         <Route path="/final" element={<FinalPreviewScreen />} />
 
-        <Route path="*" element={<Startup />} />
+        {/* <Route path="*" element={<Startup />} /> */}
         <Route path="/sa/login" element={<Login />} />
         <Route path="/sa/dashboard" element={<ProtectedSARoutes><Dashboard /></ProtectedSARoutes>} />
       </Routes>
