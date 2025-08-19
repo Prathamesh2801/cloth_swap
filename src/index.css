@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.ag-paging-panel {
+  flex-wrap: wrap;  /* allow wrapping on small screens */
+  gap: 0.5rem;      /* spacing */
+}
+
+
 .bebas-neue-regular {
   font-family: "Bebas Neue", sans-serif;
   font-weight: 400;

@@ -142,7 +142,6 @@ export default function ShopForm({ editingShop, onSuccess, onCancel }) {
         <div className="flex items-center justify-between border-b border-[#e8dabe] bg-[#f7f2e5] px-4 py-3 rounded-t-xl">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Shop Details</h3>
-            <p className="text-xs text-gray-600">Theme: light (#f7f2e5) · secondary (#e8dabe)</p>
           </div>
           <AnimatePresence>{loading ? (
             <motion.div

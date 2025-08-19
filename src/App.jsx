@@ -11,7 +11,6 @@ import Dashboard from "./components/SuperAdmin/Dashboard/Dashboard";
 import ProtectedSARoutes from "./routes/ProtectedSARoutes";
 import ShopManage from "./components/SuperAdmin/Dashboard/Shop/ShopManage";
 
-// If you have a NotFound or fallback component you can add it, otherwise fallback to Startup.
 
 export default function App() {
   return (
