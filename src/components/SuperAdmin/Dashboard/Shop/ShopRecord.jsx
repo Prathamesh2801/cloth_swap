@@ -1,10 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { motion } from "framer-motion";
-import { Edit, Trash2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Edit, Trash2, AlertTriangle, RefreshCw, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { deleteShop } from "../../../../api/ShopApi";
+import { deleteShop } from "../../../../api/SuperAdmin/ShopAPI";
+import ShopViewModal from "./ShopViewModal";
 
 export default function ShopRecord({
   shops,
@@ -14,10 +15,21 @@ export default function ShopRecord({
   onRefresh,
 }) {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [selectedShopId, setSelectedShopId] = useState(null);
+
+  const handleView = (shop) => {
+    setSelectedShopId(shop.Shop_ID);
+    setViewModalOpen(true);
+  };
 
   // Custom cell renderer for actions
   const ActionCellRenderer = useCallback(
     (params) => {
+
+      const handleViewClick = () => {
+        handleView(params.data);
+      };
       const handleEdit = () => {
         onEdit(params.data);
       };
@@ -31,8 +43,17 @@ export default function ShopRecord({
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={handleEdit}
+            onClick={handleViewClick}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+            title="View Shop"
+          >
+            <Eye className="h-4 w-4" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleEdit}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 transition-colors"
             title="Edit Shop"
           >
             <Edit className="h-4 w-4" />
@@ -65,9 +86,8 @@ export default function ShopRecord({
 
     return (
       <span
-        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-          statusColors[status] || "bg-gray-100 text-gray-800"
-        }`}
+        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[status] || "bg-gray-100 text-gray-800"
+          }`}
       >
         {status}
       </span>
@@ -220,6 +240,13 @@ export default function ShopRecord({
           </p>
         </div>
       )}
+
+      {/*   View Modal  */}
+      <ShopViewModal
+        open={viewModalOpen}
+        setOpen={setViewModalOpen}
+        shopId={selectedShopId}
+      />
 
       {/* Delete Confirmation Modal (global) */}
       {deleteConfirm && (

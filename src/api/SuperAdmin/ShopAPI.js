@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../../config";
+import { BASE_URL } from "../../../config";
 
 const SHOP_URL = BASE_URL + "/superAdmin/manageShop.php";
 
@@ -34,13 +34,16 @@ export const fetchShops = async (filters = {}) => {
         State: filters.State,
       },
     });
-
+    
     return response.data;
+
   } catch (error) {
     console.error("Error fetching shops:", error);
     throw error;
   }
 };
+
+
 
 // POST - Add new shop
 export const addShop = async (shopData) => {

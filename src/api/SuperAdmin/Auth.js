@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../../config";
+import { BASE_URL } from "../../../config";
 
 export async function login(username, password) {
   try {
@@ -10,6 +10,7 @@ export async function login(username, password) {
     console.log("Login response:", response.data);
     if (response.data.Status === true) {
       localStorage.setItem("token", response.data.Token);
+      localStorage.setItem("role", response.data.Role);
       return response.data;
     } else {
       throw new Error(

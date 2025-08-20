@@ -4,7 +4,8 @@ import { Plus, Filter, RefreshCw } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import ShopRecord from './ShopRecord'
 import ShopForm from './ShopForm'
-import { fetchShops } from '../../../../api/ShopApi'
+import { fetchShops } from '../../../../api/SuperAdmin/ShopAPI'
+
 
 export default function ShopManage() {
     const [currentView, setCurrentView] = useState('records') // 'records' or 'form'
@@ -25,7 +26,7 @@ export default function ShopManage() {
             const response = await fetchShops(appliedFilters)
             if (response.Status) {
                 setShops(response.Data.shops || [])
-                toast.success(response.Message || 'Shops loaded successfully')
+                // toast.success(response.Message || 'Shops loaded successfully')
             } else {
                 toast.error(response.Message || 'Failed to load shops')
             }

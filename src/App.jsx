@@ -1,4 +1,3 @@
-import React from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Startup from "./components/Startup";
 import SelectClothScreen from "./components/SelectClothScreen";
@@ -9,7 +8,8 @@ import Login from "./components/SuperAdmin/Login";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./components/SuperAdmin/Dashboard/Dashboard";
 import ProtectedSARoutes from "./routes/ProtectedSARoutes";
-import ShopManage from "./components/SuperAdmin/Dashboard/Shop/ShopManage";
+import ClientDashboard from "./components/Admin/Dashboard/ClientDashboard";
+import ProtectedClientRoutes from "./routes/ProtectedClientRoutes";
 
 
 export default function App() {
@@ -26,9 +26,15 @@ export default function App() {
         <Route path="/camera" element={<CameraSection />} />
         <Route path="/final" element={<FinalPreviewScreen />} />
 
-        {/* <Route path="*" element={<Startup />} /> */}
-        <Route path="/sa/login" element={<Login />} />
+        {/*  ===========================  Super Admin Side  ========================= */}
+        <Route path="/login" element={<Login />} />
         <Route path="/sa/dashboard" element={<ProtectedSARoutes><Dashboard /></ProtectedSARoutes>} />
+
+
+           {/*  =========================== Admin Side  ========================= */}
+        <Route path="/client/dashboard" element={<ProtectedClientRoutes>
+          <ClientDashboard />
+        </ProtectedClientRoutes>} />
       </Routes>
     </HashRouter>
   );

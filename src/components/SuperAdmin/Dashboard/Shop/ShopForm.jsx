@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Save, X, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { addShop, updateShop, fetchShops, getFormFields } from '../../../../api/ShopApi'
+import { addShop, updateShop, fetchShops, getFormFields } from '../../../../api/SuperAdmin/ShopAPI'
 
 /**
  * ShopForm

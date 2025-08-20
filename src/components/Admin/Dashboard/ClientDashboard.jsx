@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Home, Users, Store, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Menu, X, ChevronLeft, ChevronRight, Boxes, Layers, Shirt } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
-import ShopManage from './Shop/ShopManage'
-import UserManage from './User/UserManager'
+import CategoryManage from './Category/CategoryManage'
 
 
 
@@ -13,7 +12,7 @@ function classNames(...classes) {
 
 export default function Dashboard() {
     const location = useLocation();
-   
+
     const queryParams = new URLSearchParams(location.search);
     const activeTab = queryParams.get("tab") || "dashboard";
 
@@ -22,9 +21,10 @@ export default function Dashboard() {
 
 
     const navigation = [
-        { name: 'Dashboard', href: '#/sa/dashboard?tab=dashboard', icon: Home, current: activeTab === "dashboard" },
-        { name: 'Users', href: '#/sa/dashboard?tab=users', icon: Users, current: activeTab === "users" },
-        { name: 'Shop', href: '#/sa/dashboard?tab=shop', icon: Store, current: activeTab === "shop" },
+        { name: 'Category Record', href: '#/client/dashboard?tab=category', icon: Boxes, current: activeTab === "category" },
+        { name: 'Type Record', href: '#/client/dashboard?tab=types', icon: Layers, current: activeTab === "types" },
+        { name: 'Cloth Record', href: '#/client/dashboard?tab=cloth', icon: Shirt, current: activeTab === "cloth" },
+
     ];
 
     const sidebarVariants = {
@@ -119,14 +119,14 @@ export default function Dashboard() {
 
     const renderContent = () => {
         switch (activeTab) {
-            case "dashboard":
-                return <div>Dashboard Overview</div>;
-            case "users":
-                return <UserManage />;
-            case "shop":
-                return <ShopManage />;
+            case "category":
+                return <CategoryManage />;
+            case "types":
+                return <div>Type Overview</div>;
+            case "cloth":
+                return <div>Cloth Overview</div>;
             default:
-                return <div>Dashboard Overview</div>;
+                return <div>Category Overview</div>;
         }
     };
 
