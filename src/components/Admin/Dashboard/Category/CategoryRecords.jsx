@@ -2,15 +2,18 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { motion } from 'framer-motion';
 import { Edit, Trash2, Eye, RefreshCw, Filter, Image as ImageIcon } from 'lucide-react';
+import { BASE_URL } from '../../../../../config';
+import ConfirmModal from '../../../ui/ConfirmModal';
+import ImageModal from '../../../ui/ImageModal';
 
 
-const CategoryRecords = ({ 
-  categories, 
-  loading, 
-  onEdit, 
-  onView, 
-  onDelete, 
-  onRefresh 
+const CategoryRecords = ({
+  categories,
+  loading,
+  onEdit,
+  onView,
+  onDelete,
+  onRefresh
 }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -18,11 +21,13 @@ const CategoryRecords = ({
     Category_Title: ''
   });
   const [imageModal, setImageModal] = useState({ show: false, src: '', title: '' });
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
 
   // Image renderer with preview
   const ImageRenderer = useCallback((params) => {
-    const imageUrl = params.value;
-    
+    const imageUrl = BASE_URL + '/' + params.value;
+
     if (!imageUrl) {
       return (
         <div className="flex items-center justify-center h-full">
@@ -46,7 +51,7 @@ const CategoryRecords = ({
         <motion.img
           src={imageUrl}
           alt={params.data.Category_Title}
-          className="w-10 h-10 object-cover rounded-lg cursor-pointer border-2 border-gray-200 hover:border-[#8B7355]"
+          className="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 border-gray-200 hover:border-[#8B7355]"
           onClick={handleImageClick}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -60,10 +65,9 @@ const CategoryRecords = ({
     const handleView = () => onView(params.data);
     const handleEdit = () => onEdit(params.data);
     const handleDelete = () => {
-      if (window.confirm(`Are you sure you want to delete category "${params.data.Category_Title}"?`)) {
-        onDelete(params.data.Category_ID);
-      }
+      setDeleteConfirm(params.data); // store the category to delete
     };
+
 
     return (
       <div className="flex items-center space-x-1 h-full">
@@ -125,9 +129,10 @@ const CategoryRecords = ({
   const columnDefs = useMemo(() => [
     {
       headerName: 'Image',
-      field: 'Category_Image',
+      field: 'Image_URL',
       cellRenderer: ImageRenderer,
-      width: 80,
+      width: 100,
+
       sortable: false,
       filter: false
     },
@@ -137,32 +142,35 @@ const CategoryRecords = ({
       sortable: true,
       filter: true,
       flex: 1,
-      minWidth: 150,
-      cellStyle: { fontWeight: '500' }
+      minWidth: 200,
+      cellStyle: { fontWeight: '500' },
+      cellClass: "flex items-center justify-start text-gray-700 text-sm",
     },
     {
       headerName: 'Gender',
       field: 'Gender',
       sortable: true,
       filter: true,
-      width: 120,
-      cellRenderer: GenderBadgeRenderer
+      width: 150,
+      cellRenderer: GenderBadgeRenderer,
+      cellClass: "flex items-center justify-start ",
     },
     {
       headerName: 'Category ID',
       field: 'Category_ID',
       sortable: true,
       filter: true,
-      width: 120,
-      cellStyle: { color: '#6B7280', fontSize: '0.875rem' }
+      // width: 120,
+      cellStyle: { color: '#6B7280', fontSize: '0.875rem' },
+      cellClass: "flex items-center justify-start  text-sm",
     },
     {
       headerName: 'Actions',
       cellRenderer: ActionButtonsRenderer,
-      width: 120,
+      // width: 120,
       sortable: false,
       filter: false,
-      pinned: 'right'
+      // pinned: 'right'
     }
   ], [ImageRenderer, ActionButtonsRenderer, GenderBadgeRenderer]);
 
@@ -176,11 +184,11 @@ const CategoryRecords = ({
   // Filter categories based on local filters
   const filteredCategories = useMemo(() => {
     return categories.filter(category => {
-      const matchesGender = !filters.Gender || 
+      const matchesGender = !filters.Gender ||
         category.Gender?.toLowerCase().includes(filters.Gender.toLowerCase());
-      const matchesTitle = !filters.Category_Title || 
+      const matchesTitle = !filters.Category_Title ||
         category.Category_Title?.toLowerCase().includes(filters.Category_Title.toLowerCase());
-      
+
       return matchesGender && matchesTitle;
     });
   }, [categories, filters]);
@@ -200,7 +208,7 @@ const CategoryRecords = ({
   return (
     <div className="space-y-4">
       {/* Filter Bar */}
-      <motion.div 
+      <motion.div
         className="bg-white rounded-lg shadow-sm border border-[#e8dabe] p-4"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -214,22 +222,21 @@ const CategoryRecords = ({
               </span>
             )}
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <motion.button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${
-                showFilters 
-                  ? 'bg-[#8B7355] text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${showFilters
+                ? 'bg-[#8B7355] text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <Filter className="h-4 w-4" />
               <span>Filters</span>
             </motion.button>
-            
+
             <motion.button
               onClick={onRefresh}
               disabled={loading}
@@ -263,7 +270,7 @@ const CategoryRecords = ({
                 <option value="Unisex">Unisex</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Category Title</label>
               <input
@@ -274,7 +281,7 @@ const CategoryRecords = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
               />
             </div>
-            
+
             <div className="flex items-end space-x-2">
               <motion.button
                 onClick={handleFilterReset}
@@ -290,7 +297,7 @@ const CategoryRecords = ({
       </motion.div>
 
       {/* Data Grid */}
-      <motion.div 
+      <motion.div
         className="bg-white rounded-lg shadow-sm border border-[#e8dabe] overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -304,11 +311,12 @@ const CategoryRecords = ({
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
-            rowHeight={70}
+            rowHeight={100}
             headerHeight={50}
+
             animateRows={true}
-            rowSelection="single"
-            suppressRowClickSelection={true}
+            // rowSelection={{ mode: 'singleRow', enableClickSelection: false }}
+
             loading={loading}
             overlayLoadingTemplate='<span class="text-gray-600">Loading categories...</span>'
             overlayNoRowsTemplate='<span class="text-gray-600">No categories found</span>'
@@ -324,40 +332,36 @@ const CategoryRecords = ({
       </motion.div>
 
       {/* Image Modal */}
-      {imageModal.show && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeImageModal}
-        >
-          <motion.div
-            className="relative max-w-4xl max-h-full"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={imageModal.src}
-              alt={imageModal.title}
-              className="max-w-full max-h-[80vh] object-contain rounded-lg"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-4 rounded-b-lg">
-              <h3 className="text-lg font-medium">{imageModal.title}</h3>
-            </div>
-            <motion.button
-              onClick={closeImageModal}
-              className="absolute top-4 right-4 bg-white text-black p-2 rounded-full hover:bg-gray-100 transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              ✕
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      )}
+      <ImageModal
+        isOpen={imageModal.show}
+        onClose={closeImageModal}
+        imageSrc={imageModal.src}
+        imageTitle={imageModal.title}
+        imageAlt={imageModal.title || 'Category image'}
+        showTitle={true}
+        overlayOpacity={0.75}
+        maxWidth="4xl"
+      />
+
+      <ConfirmModal
+        open={!!deleteConfirm}
+        title="Confirm Delete"
+        message={
+          deleteConfirm
+            ? `Are you sure you want to delete category "${deleteConfirm.Category_Title}"? This action cannot be undone.`
+            : ""
+        }
+        confirmText="Delete"
+        confirmColor="bg-red-600 hover:bg-red-700"
+        onCancel={() => setDeleteConfirm(null)}
+        onConfirm={() => {
+          if (deleteConfirm) {
+            onDelete(deleteConfirm.Category_ID);
+            setDeleteConfirm(null);
+          }
+        }}
+      />
+
     </div>
   );
 };

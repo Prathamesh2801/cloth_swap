@@ -22,11 +22,11 @@ export default function ShopForm({ editingShop, onSuccess, onCancel }) {
   // Known field metadata (labels, types, validation). Anything not listed defaults to text input
   const fieldMeta = useMemo(() => ({
     Shop_Name: { label: 'Shop Name', required: true, placeholder: 'e.g., Acme Super Store' },
-    Address_1: { label: 'Address Line 1', placeholder: 'Building / Street' },
+    Address_1: { label: 'Address Line 1', required: true, placeholder: 'Building / Street' },
     Address_2: { label: 'Address Line 2', placeholder: 'Area / Landmark' },
     City: { label: 'City', required: true },
     State: { label: 'State', required: true },
-    Pincode: { label: 'Pincode', inputMode: 'numeric', pattern: '^\\d{6}$', placeholder: '6-digit code' },
+    Pincode: { label: 'Pincode', inputMode: 'numeric', pattern: '^\\d{6}$', placeholder: '6-digit code', required: true },
     Status: { label: 'Status', type: 'select', options: ['Active', 'Pending', 'Inactive', 'Suspended'], required: true },
   }), [])
 

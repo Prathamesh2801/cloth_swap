@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ChevronLeft, ChevronRight, Boxes, Layers, Shirt } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import CategoryManage from './Category/CategoryManage'
+import CategoryTypesManage from './CategoryTypes/CategoryTypesManage'
+import FinalClothManage from './FinalClothes/FinalClothManage'
 
 
 
@@ -122,11 +124,11 @@ export default function Dashboard() {
             case "category":
                 return <CategoryManage />;
             case "types":
-                return <div>Type Overview</div>;
+                return <CategoryTypesManage />
             case "cloth":
-                return <div>Cloth Overview</div>;
+                return <FinalClothManage />
             default:
-                return <div>Category Overview</div>;
+                return <CategoryManage />;
         }
     };
 

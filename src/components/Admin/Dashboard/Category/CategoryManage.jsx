@@ -4,12 +4,12 @@ import { toast } from 'react-hot-toast';
 import { Package, Plus, ArrowLeft } from 'lucide-react';
 import CategoryRecords from './CategoryRecords';
 import CategoryForm from './CategoryForm';
-import { 
-  getCategories, 
-  createCategory, 
-  updateCategory, 
-  updateCategoryWithImage, 
-  deleteCategory 
+import {
+  getCategories,
+  createCategory,
+  updateCategory,
+  updateCategoryWithImage,
+  deleteCategory
 } from '../../../../api/Client/CategoryAPI';
 
 const CategoryManage = () => {
@@ -19,8 +19,8 @@ const CategoryManage = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [viewingCategory, setViewingCategory] = useState(null);
   const [formMode, setFormMode] = useState('create'); // 'create', 'edit', 'view'
-  const [userRole, setUserRole] = useState('Admin'); // Get from auth context
-  const [shopId, setShopId] = useState(null); // Get from auth context
+  const userRole = localStorage.getItem('role');
+  const [shopId, setShopId] = useState(null); // Get from Super Admin through redirect
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -46,7 +46,7 @@ const CategoryManage = () => {
 
   const handleCreateCategory = async (categoryData) => {
     const promise = createCategory(categoryData);
-    
+
     toast.promise(promise, {
       loading: 'Creating category...',
       success: (response) => {
@@ -65,10 +65,10 @@ const CategoryManage = () => {
 
   const handleUpdateCategory = async (updateData) => {
     const hasImage = updateData.image instanceof File;
-    const promise = hasImage 
+    const promise = hasImage
       ? updateCategoryWithImage(updateData)
       : updateCategory(updateData);
-    
+
     toast.promise(promise, {
       loading: 'Updating category...',
       success: (response) => {
@@ -79,6 +79,7 @@ const CategoryManage = () => {
           return response.Message || 'Category updated successfully!';
         }
         throw new Error(response.Message || 'Failed to update category');
+
       },
       error: (err) => err.message || 'Failed to update category'
     });
@@ -88,7 +89,7 @@ const CategoryManage = () => {
 
   const handleDeleteCategory = async (categoryId) => {
     const promise = deleteCategory(categoryId);
-    
+
     toast.promise(promise, {
       loading: 'Deleting category...',
       success: (response) => {
@@ -130,18 +131,6 @@ const CategoryManage = () => {
     setFormMode('create');
   };
 
-  const getHeaderTitle = () => {
-    switch (formMode) {
-      case 'view':
-        return 'View Category Details';
-      case 'edit':
-        return 'Edit Category';
-      case 'create':
-      default:
-        return 'Create New Category';
-    }
-  };
-
   const getHeaderSubtitle = () => {
     switch (formMode) {
       case 'view':
@@ -158,7 +147,7 @@ const CategoryManage = () => {
     <div className="min-h-screen bg-[#f7f2e5] p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,7 +175,7 @@ const CategoryManage = () => {
                 </p>
               </div>
             </div>
-            
+
             {currentView === 'records' && (
               <motion.button
                 onClick={handleNewCategory}

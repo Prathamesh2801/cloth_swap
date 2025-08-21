@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Save, X, Upload, Image as ImageIcon, Eye, Edit3, Package } from 'lucide-react';
+import { Save, X, Upload, Image as ImageIcon, Eye, Edit3, Package, ChevronDown, Search } from 'lucide-react';
 import { BASE_URL } from '../../../../../config';
+import { getCategoriesTypes } from '../../../../api/Client/CategoryTypesAPI';
 
-const CategoryForm = ({
-  editingCategory,
-  viewingCategory,
+const CategoryTypesForm = ({
+  editingType,
+  viewingType,
   onSubmit,
   onCancel,
   mode = 'create'
 }) => {
   const [formData, setFormData] = useState({
-    Category_Title: '',
-    Gender: '',
-    image: null
+    Type_Title: '',
+    Type_Description: '',
+    image: null,
+    Category_ID: ''
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,35 +23,170 @@ const CategoryForm = ({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Category dropdown state
+  const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [categorySearchTerm, setCategorySearchTerm] = useState('');
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const categoryDropdownRef = useRef(null);
+
   const isViewMode = mode === 'view';
   const isEditMode = mode === 'edit';
   const isCreateMode = mode === 'create';
 
+  // Load categories on component mount
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  // Handle clicks outside category dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+        setShowCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Load categories from API
+  const loadCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const response = await getCategoriesTypes('', null, null, null);
+      if (response.Status && response.Data) {
+        // Extract unique categories from the response
+        const uniqueCategories = response.Data.reduce((acc, item) => {
+          const existingCategory = acc.find(cat => cat.Category_ID === item.Category_ID);
+          if (!existingCategory) {
+            acc.push({
+              Category_ID: item.Category_ID,
+              Category_Title: item.Category_Title,
+              Shop_Name: item.Shop_Name
+            });
+          }
+          return acc;
+        }, []);
+        setCategories(uniqueCategories);
+        setFilteredCategories(uniqueCategories);
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  // Simple fuzzy search implementation
+  const fuzzySearch = (items, searchTerm) => {
+    if (!searchTerm) return items;
+    
+    const term = searchTerm.toLowerCase();
+    return items.filter(item => {
+      const title = item.Category_Title.toLowerCase();
+      const id = item.Category_ID.toLowerCase();
+      
+      // Exact match gets highest priority
+      if (title.includes(term) || id.includes(term)) {
+        return true;
+      }
+      
+      // Character-by-character fuzzy match
+      let termIndex = 0;
+      for (let i = 0; i < title.length && termIndex < term.length; i++) {
+        if (title[i] === term[termIndex]) {
+          termIndex++;
+        }
+      }
+      return termIndex === term.length;
+    }).sort((a, b) => {
+      // Sort by relevance
+      const aTitle = a.Category_Title.toLowerCase();
+      const bTitle = b.Category_Title.toLowerCase();
+      const aExact = aTitle.includes(term);
+      const bExact = bTitle.includes(term);
+      
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+      return aTitle.localeCompare(bTitle);
+    });
+  };
+
+  // Handle category search
+  const handleCategorySearch = (searchTerm) => {
+    setCategorySearchTerm(searchTerm);
+    const filtered = fuzzySearch(categories, searchTerm);
+    setFilteredCategories(filtered);
+  };
+
+  // Handle category selection
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setFormData(prev => ({
+      ...prev,
+      Category_ID: category.Category_ID
+    }));
+    setCategorySearchTerm(category.Category_Title);
+    setShowCategoryDropdown(false);
+    
+    // Clear category error
+    if (errors.Category_ID) {
+      setErrors(prev => ({ ...prev, Category_ID: '' }));
+    }
+  };
+
   // Pre-fill form when editing or viewing
   useEffect(() => {
-    const categoryData = editingCategory || viewingCategory;
+    const typeData = editingType || viewingType;
 
-    if ((isEditMode || isViewMode) && categoryData) {
+    if ((isEditMode || isViewMode) && typeData) {
       setFormData({
-        Category_Title: categoryData.Category_Title || '',
-        Gender: categoryData.Gender || '',
-        image: null // Don't set the image file, just show preview
+        Type_Title: typeData.Type_Title || '',
+        Type_Description: typeData.Type_Description || '',
+        image: null,
+        Category_ID: typeData.Category_ID || ''
       });
 
+      // Set selected category if available
+      if (typeData.Category_ID) {
+        const category = categories.find(cat => cat.Category_ID === typeData.Category_ID);
+        if (category) {
+          setSelectedCategory(category);
+          setCategorySearchTerm(category.Category_Title);
+        } else {
+          // If category not found in the list, create a temporary one
+          const tempCategory = {
+            Category_ID: typeData.Category_ID,
+            Category_Title: typeData.Category_Title || typeData.Category_ID
+          };
+          setSelectedCategory(tempCategory);
+          setCategorySearchTerm(tempCategory.Category_Title);
+        }
+      }
+
       // Set image preview if exists
-      if (categoryData.Image_URL) {
-        setImagePreview(BASE_URL + '/' + categoryData.Image_URL);
+      if (typeData.Image_URL) {
+        setImagePreview(BASE_URL + '/' + typeData.Image_URL);
       }
     } else if (isCreateMode) {
       setFormData({
-        Category_Title: '',
-        Gender: '',
-        image: null
+        Type_Title: '',
+        Type_Description: '',
+        image: null,
+        Category_ID: ''
       });
+      setSelectedCategory(null);
+      setCategorySearchTerm('');
       setImagePreview(null);
     }
     setErrors({});
-  }, [editingCategory, viewingCategory, mode]);
+  }, [editingType, viewingType, mode, categories]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +223,7 @@ const CategoryForm = ({
         setErrors(prev => ({ ...prev, image: '' }));
       }
     } else {
-      toast.error('Please select a valid image file');
+      setErrors(prev => ({ ...prev, image: 'Please select a valid image file' }));
     }
   };
 
@@ -128,18 +265,14 @@ const CategoryForm = ({
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.Category_Title.trim()) {
-      newErrors.Category_Title = 'Category title is required';
-    } else if (formData.Category_Title.length < 2) {
-      newErrors.Category_Title = 'Category title must be at least 2 characters';
+    if (!formData.Type_Title.trim()) {
+      newErrors.Type_Title = 'Type title is required';
+    } else if (formData.Type_Title.length < 2) {
+      newErrors.Type_Title = 'Type title must be at least 2 characters';
     }
 
-    if (!formData.Gender) {
-      newErrors.Gender = 'Gender is required';
-    }
-
-    if (isCreateMode && !formData.image && !imagePreview) {
-      newErrors.image = 'Category image is required';
+    if (!formData.Category_ID) {
+      newErrors.Category_ID = 'Category is required';
     }
 
     setErrors(newErrors);
@@ -158,9 +291,10 @@ const CategoryForm = ({
     try {
       if (isEditMode) {
         const editData = {
-          Category_ID: editingCategory.Category_ID,
-          Category_Title: formData.Category_Title,
-          Gender: formData.Gender
+          Type_ID: editingType.Type_ID,
+          Type_Title: formData.Type_Title,
+          Type_Description: formData.Type_Description,
+          Category_ID: formData.Category_ID
         };
 
         // If there's a new image, include it
@@ -193,22 +327,22 @@ const CategoryForm = ({
   const getFormTitle = () => {
     switch (mode) {
       case 'view':
-        return 'Category Details';
+        return 'Category Type Details';
       case 'edit':
-        return 'Edit Category';
+        return 'Edit Category Type';
       default:
-        return 'Create New Category';
+        return 'Create New Category Type';
     }
   };
 
   const getFormSubtitle = () => {
     switch (mode) {
       case 'view':
-        return 'View category information and image';
+        return 'View category type information and image';
       case 'edit':
-        return 'Update category information and image';
+        return 'Update category type information and image';
       default:
-        return 'Add a new category with image';
+        return 'Add a new category type with image';
     }
   };
 
@@ -239,12 +373,80 @@ const CategoryForm = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Category Selection Field */}
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <Search className="h-4 w-4" />
+              <span>Category *</span>
+            </label>
+            <div className="relative" ref={categoryDropdownRef}>
+              <div
+                className={`w-full px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
+                  errors.Category_ID ? 'border-red-500' : 'border-gray-300'
+                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : 'hover:border-[#8B7355] focus-within:ring-2 focus-within:ring-[#8B7355] focus-within:border-transparent'}`}
+                onClick={() => !isViewMode && setShowCategoryDropdown(!showCategoryDropdown)}
+              >
+                <div className="flex items-center justify-between">
+                  <input
+                    type="text"
+                    value={categorySearchTerm}
+                    onChange={(e) => handleCategorySearch(e.target.value)}
+                    onFocus={() => !isViewMode && setShowCategoryDropdown(true)}
+                    placeholder="Search and select category..."
+                    className="flex-1 outline-none bg-transparent"
+                    disabled={isViewMode}
+                  />
+                  <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+                </div>
+              </div>
+
+              {/* Dropdown */}
+              {showCategoryDropdown && !isViewMode && (
+                <motion.div
+                  className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  {loadingCategories ? (
+                    <div className="p-3 text-center text-gray-500">Loading categories...</div>
+                  ) : filteredCategories.length > 0 ? (
+                    filteredCategories.map((category) => (
+                      <div
+                        key={category.Category_ID}
+                        className="p-3 hover:bg-[#f7f2e5] cursor-pointer border-b border-gray-100 last:border-b-0"
+                        onClick={() => handleCategorySelect(category)}
+                      >
+                        <div className="font-medium text-gray-800">{category.Category_Title}</div>
+                        <div className="text-sm text-gray-500">ID: {category.Category_ID}</div>
+                        {category.Shop_Name && (
+                          <div className="text-xs text-gray-400">Shop: {category.Shop_Name}</div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-gray-500">No categories found</div>
+                  )}
+                </motion.div>
+              )}
+            </div>
+            {errors.Category_ID && (
+              <motion.p
+                className="text-red-500 text-sm flex items-center space-x-1"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <span>{errors.Category_ID}</span>
+              </motion.p>
+            )}
+          </div>
+
           {/* Image Upload Section */}
           <div className="flex flex-col items-center justify-center space-y-4 w-full">
             {/* Label */}
             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
               <ImageIcon className="h-4 w-4" />
-              <span>Category Image {!isViewMode && '*'}</span>
+              <span>Type Image </span>
             </label>
 
             {/* Image Preview + Upload */}
@@ -257,7 +459,7 @@ const CategoryForm = ({
                 >
                   <img
                     src={imagePreview}
-                    alt="Category preview"
+                    alt="Type preview"
                     className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300"
                   />
                   {!isViewMode && (
@@ -326,78 +528,74 @@ const CategoryForm = ({
             )}
           </div>
 
-
-          {/* Category Title Field */}
+          {/* Type Title Field */}
           <div className="space-y-2">
             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
               <Package className="h-4 w-4" />
-              <span>Category Title *</span>
+              <span>Type Title *</span>
             </label>
             <input
               type="text"
-              name="Category_Title"
-              value={formData.Category_Title}
+              name="Type_Title"
+              value={formData.Type_Title}
               onChange={handleInputChange}
               disabled={isViewMode}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${errors.Category_Title ? 'border-red-500' : 'border-gray-300'
-                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
-              placeholder="Enter category title"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${
+                errors.Type_Title ? 'border-red-500' : 'border-gray-300'
+              } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              placeholder="Enter type title"
             />
-            {errors.Category_Title && (
+            {errors.Type_Title && (
               <motion.p
                 className="text-red-500 text-sm flex items-center space-x-1"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <span>{errors.Category_Title}</span>
+                <span>{errors.Type_Title}</span>
               </motion.p>
             )}
           </div>
 
-          {/* Gender Field */}
+          {/* Type Description Field */}
           <div className="space-y-2">
             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span>Gender *</span>
+              <Edit3 className="h-4 w-4" />
+              <span>Type Description</span>
             </label>
-            <select
-              name="Gender"
-              value={formData.Gender}
+            <textarea
+              name="Type_Description"
+              value={formData.Type_Description}
               onChange={handleInputChange}
               disabled={isViewMode}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${errors.Gender ? 'border-red-500' : 'border-gray-300'
-                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
-            >
-              <option value="">Select gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Unisex">Unisex</option>
-            </select>
-            {errors.Gender && (
+              rows={3}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors resize-none ${
+                errors.Type_Description ? 'border-red-500' : 'border-gray-300'
+              } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              placeholder="Enter type description (optional)"
+            />
+            {errors.Type_Description && (
               <motion.p
                 className="text-red-500 text-sm flex items-center space-x-1"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <span>{errors.Gender}</span>
+                <span>{errors.Type_Description}</span>
               </motion.p>
             )}
           </div>
 
-          {/* Category ID Field (View/Edit Mode Only) */}
-          {(isViewMode || isEditMode) && (editingCategory || viewingCategory) && (
+          {/* Type ID Field (View/Edit Mode Only) */}
+          {(isViewMode || isEditMode) && (editingType || viewingType) && (
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                 </svg>
-                <span>Category ID</span>
+                <span>Type ID</span>
               </label>
               <input
                 type="text"
-                value={(editingCategory || viewingCategory)?.Category_ID || ''}
+                value={(editingType || viewingType)?.Type_ID || ''}
                 disabled
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed text-gray-500"
               />
@@ -429,7 +627,7 @@ const CategoryForm = ({
                 <span>
                   {isSubmitting
                     ? (isEditMode ? 'Updating...' : 'Creating...')
-                    : (isEditMode ? 'Update Category' : 'Create Category')
+                    : (isEditMode ? 'Update Type' : 'Create Type')
                   }
                 </span>
               </motion.button>
@@ -462,8 +660,10 @@ const CategoryForm = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h4 className="text-sm font-medium text-blue-800 mb-2">Image Guidelines:</h4>
+          <h4 className="text-sm font-medium text-blue-800 mb-2">Guidelines:</h4>
           <ul className="text-xs text-blue-700 space-y-1">
+            <li>• Select a category from the dropdown using fuzzy search</li>
+            <li>• Type in the category search box to filter results</li>
             <li>• Use high-quality images with good lighting</li>
             <li>• Recommended size: 500x500px or larger</li>
             <li>• Supported formats: JPG, PNG, GIF</li>
@@ -475,4 +675,4 @@ const CategoryForm = ({
   );
 };
 
-export default CategoryForm;
+export default CategoryTypesForm;

@@ -1,7 +1,8 @@
 // src/api/CategoryAPI.js
 import axios from "axios";
+import { BASE_URL } from "../../../config";
 
-const BASE_URL = "http://192.168.1.55/ClothSwap/API";
+
 
 // 🔑 Get Token from localStorage
 function getAuthHeaders() {

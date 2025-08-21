@@ -14,11 +14,11 @@ export async function login(username, password) {
       return response.data;
     } else {
       throw new Error(
-        response.data.Message || "Login failed. Please try again."
+        response.data.Message || "Login failed  . Please try again."
       );
     }
   } catch (error) {
     console.error("Login failed:", error);
-    throw new Error("Login failed. Please try again.");
+    throw new Error(error?.message || "Login failed  . Please try again.");
   }
 }

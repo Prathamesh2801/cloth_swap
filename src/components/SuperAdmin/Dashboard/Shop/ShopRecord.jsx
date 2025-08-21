@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { deleteShop } from "../../../../api/SuperAdmin/ShopAPI";
 import ShopViewModal from "./ShopViewModal";
+import ConfirmModal from "../../../ui/ConfirmModal";
 
 export default function ShopRecord({
   shops,
@@ -249,57 +250,36 @@ export default function ShopRecord({
       />
 
       {/* Delete Confirmation Modal (global) */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Confirm Delete
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Are you sure you want to delete "{deleteConfirm.Shop_Name}"?
-                  This action cannot be undone.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  const deletePromise = deleteShop(deleteConfirm.Shop_ID);
-                  toast.promise(deletePromise, {
-                    loading: "Deleting shop...",
-                    success: (response) => {
-                      onDeleteSuccess();
-                      setDeleteConfirm(null);
-                      return (
-                        response.Message || "Shop deleted successfully"
-                      );
-                    },
-                    error: (error) => {
-                      return "Failed to delete shop: " + error.message;
-                    },
-                  });
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+
+      <ConfirmModal
+        open={!!deleteConfirm}
+        title="Confirm Delete"
+        message={
+          deleteConfirm
+            ? `Are you sure you want to delete category "${deleteConfirm.Shop_Name}"? This action cannot be undone.`
+            : ""
+        }
+        confirmText="Delete"
+        confirmColor="bg-red-600 hover:bg-red-700"
+        onCancel={() => setDeleteConfirm(null)}
+        onConfirm={async () => {
+          if (deleteConfirm) {
+            const deletePromise = deleteShop(deleteConfirm.Shop_ID); // your API call
+            toast.promise(deletePromise, {
+              loading: "Deleting shop...",
+              success: (response) => {
+                onRefresh(); // refresh table
+                setDeleteConfirm(null);
+                return response.Message || "Category deleted successfully";
+              },
+              error: (error) => {
+                return "Failed to delete category: " + error.message;
+              },
+            });
+          }
+        }}
+      />
+
     </div>
   );
 }
