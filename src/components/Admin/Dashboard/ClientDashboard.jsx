@@ -119,6 +119,11 @@ export default function Dashboard() {
         }
     }
 
+    const logout = () => {
+        localStorage.clear();
+        window.location.href = '/#/login';
+    }
+
     const renderContent = () => {
         switch (activeTab) {
             case "category":
@@ -209,8 +214,9 @@ export default function Dashboard() {
 
                                     {/* User profile */}
                                     <div className="border-t border-gray-700 p-4">
-                                        <a
-                                            href="#/sa/login"
+                                        <button
+                                            onClick={logout}
+                                           
                                             className="flex items-center gap-x-3 rounded-md p-3 text-sm font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                                         >
                                             <img
@@ -219,7 +225,7 @@ export default function Dashboard() {
                                                 className="h-8 w-8 rounded-full"
                                             />
                                             <span>Tom Cook</span>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -238,7 +244,7 @@ export default function Dashboard() {
                         <div className="flex h-16 shrink-0 items-center justify-between">
                             <AnimatePresence mode="wait">
                                 {!desktopSidebarCollapsed && (
-                                   
+
                                     <div className="mt-6 text-center ">
                                         <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
                                             Cloth{" "}
@@ -313,8 +319,9 @@ export default function Dashboard() {
                                     "mt-auto",
                                     desktopSidebarCollapsed ? "mx-0" : "-mx-6"
                                 )}>
-                                    <motion.a
-                                        href="#/sa/login"
+                                    <motion.button
+                                        onClick={logout}
+                                        
                                         whileHover={{ scale: 1.02 }}
                                         className={classNames(
                                             "flex items-center gap-x-4 py-3 text-sm font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors rounded-md",
@@ -339,7 +346,7 @@ export default function Dashboard() {
                                                 </motion.span>
                                             )}
                                         </AnimatePresence>
-                                    </motion.a>
+                                    </motion.button>
                                 </li>
                             </ul>
                         </nav>

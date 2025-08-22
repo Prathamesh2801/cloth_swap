@@ -1,12 +1,13 @@
 import { useState, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { motion } from "framer-motion";
-import { Edit, Trash2, AlertTriangle, RefreshCw, Eye } from "lucide-react";
+import { Edit, Trash2, RefreshCw, Eye, SquareArrowOutUpRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { deleteShop } from "../../../../api/SuperAdmin/ShopAPI";
 import ShopViewModal from "./ShopViewModal";
 import ConfirmModal from "../../../ui/ConfirmModal";
+import { useNavigate } from "react-router-dom";
 
 export default function ShopRecord({
   shops,
@@ -18,7 +19,7 @@ export default function ShopRecord({
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [selectedShopId, setSelectedShopId] = useState(null);
-
+  const navigate = useNavigate();
   const handleView = (shop) => {
     setSelectedShopId(shop.Shop_ID);
     setViewModalOpen(true);
@@ -37,6 +38,16 @@ export default function ShopRecord({
 
       const showDeleteConfirm = () => {
         setDeleteConfirm(params.data); // store whole shop object
+      };
+      const redirectToAdmin = () => {
+        const shopId = params.data.Shop_ID;
+        if (!shopId) {
+          toast.error("Shop ID not found");
+          return;
+
+        }
+        localStorage.setItem("shopId", shopId);
+        navigate('/client/dashboard');
       };
 
       return (
@@ -68,6 +79,16 @@ export default function ShopRecord({
             title="Delete Shop"
           >
             <Trash2 className="h-4 w-4" />
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={redirectToAdmin}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
+            title="Redirect Shop"
+          >
+            <SquareArrowOutUpRight className="h-4 w-4" />
           </motion.button>
         </div>
       );

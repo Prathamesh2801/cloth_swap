@@ -8,7 +8,6 @@ import {
   getCategories,
   createCategory,
   updateCategory,
-  updateCategoryWithImage,
   deleteCategory
 } from '../../../../api/Client/CategoryAPI';
 
@@ -20,7 +19,7 @@ const CategoryManage = () => {
   const [viewingCategory, setViewingCategory] = useState(null);
   const [formMode, setFormMode] = useState('create'); // 'create', 'edit', 'view'
   const userRole = localStorage.getItem('role');
-  const [shopId, setShopId] = useState(null); // Get from Super Admin through redirect
+
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -30,7 +29,7 @@ const CategoryManage = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await getCategories(userRole, shopId);
+      const response = await getCategories();
       if (response.Status) {
         setCategories(response.Data || []);
       } else {
@@ -64,28 +63,26 @@ const CategoryManage = () => {
   };
 
   const handleUpdateCategory = async (updateData) => {
-    const hasImage = updateData.image instanceof File;
-    const promise = hasImage
-      ? updateCategoryWithImage(updateData)
-      : updateCategory(updateData);
+    const promise = updateCategory(updateData);
 
     toast.promise(promise, {
       loading: 'Updating category...',
       success: (response) => {
+        console.log("Update response:", response);
         if (response.Status) {
-          fetchCategories(); // Refresh the list
+          fetchCategories();
           setCurrentView('records');
           setEditingCategory(null);
           return response.Message || 'Category updated successfully!';
         }
         throw new Error(response.Message || 'Failed to update category');
-
       },
       error: (err) => err.message || 'Failed to update category'
     });
 
     return promise;
   };
+
 
   const handleDeleteCategory = async (categoryId) => {
     const promise = deleteCategory(categoryId);
