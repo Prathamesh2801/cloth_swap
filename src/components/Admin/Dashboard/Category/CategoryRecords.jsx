@@ -137,6 +137,15 @@ const CategoryRecords = ({
       filter: false
     },
     {
+      headerName: 'Category ID',
+      field: 'Category_ID',
+      sortable: true,
+      filter: true,
+
+      cellStyle: { color: '#6B7280', fontSize: '0.875rem' },
+      cellClass: "flex items-center justify-start  text-sm",
+    },
+    {
       headerName: 'Category Title',
       field: 'Category_Title',
       sortable: true,
@@ -155,15 +164,7 @@ const CategoryRecords = ({
       cellRenderer: GenderBadgeRenderer,
       cellClass: "flex items-center justify-start ",
     },
-    {
-      headerName: 'Category ID',
-      field: 'Category_ID',
-      sortable: true,
-      filter: true,
-      // width: 120,
-      cellStyle: { color: '#6B7280', fontSize: '0.875rem' },
-      cellClass: "flex items-center justify-start  text-sm",
-    },
+
     {
       headerName: 'Actions',
       cellRenderer: ActionButtonsRenderer,

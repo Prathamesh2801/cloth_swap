@@ -17,8 +17,10 @@ const CategoryTypesRecords = ({
 }) => {
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
+        Category_ID: '',
+        Type_ID: '',
         Type_Title: '',
-        Type_Description: ''
+
     });
     const [imageModal, setImageModal] = useState({ show: false, src: '', title: '' });
     const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -106,6 +108,13 @@ const CategoryTypesRecords = ({
             filter: false
         },
         {
+            headerName: 'Type Id',
+            field: 'Type_ID',
+            sortable: true,
+            filter: true,
+            cellClass: "flex items-center justify-start text-gray-700 text-sm",
+        },
+        {
             headerName: 'Type Title',
             field: 'Type_Title',
             sortable: true,
@@ -121,6 +130,15 @@ const CategoryTypesRecords = ({
             filter: true,
             flex: 1,
             minWidth: 120,
+            cellClass: "flex items-center justify-start text-gray-700 text-sm",
+        },
+        {
+            headerName: 'Category Id',
+            field: 'Category_ID',
+            sortable: true,
+            filter: true,
+
+
             cellClass: "flex items-center justify-start text-gray-700 text-sm",
         },
 
@@ -144,9 +162,10 @@ const CategoryTypesRecords = ({
     // Filtering logic (optional, can be expanded)
     const filteredTypes = useMemo(() => {
         return types.filter(type => {
+            const CategoryIdMatch = type.Category_ID.toLowerCase().includes(filters.Category_ID.toLowerCase());
+            const TypeIdMatch = type.Type_ID.toLowerCase().includes(filters.Type_ID.toLowerCase());
             const titleMatch = type.Type_Title.toLowerCase().includes(filters.Type_Title.toLowerCase());
-            const descMatch = type.Type_Description.toLowerCase().includes(filters.Type_Description.toLowerCase());
-            return titleMatch && descMatch;
+            return CategoryIdMatch && TypeIdMatch && titleMatch;
         });
     }, [types, filters]);
 
@@ -167,7 +186,7 @@ const CategoryTypesRecords = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <span className="font-medium">Total Types: {filteredTypes.length}</span>
-                        {(filters.Type_Title || filters.Type_Description) && (
+                        {(filters.Category_ID || filters.Type_ID || filters.Type_Title) && (
                             <span className="text-[#8B7355]">
                                 (Filtered from {types.length})
                             </span>
@@ -206,6 +225,26 @@ const CategoryTypesRecords = ({
                         exit={{ opacity: 0, height: 0 }}
                     >
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Category Id</label>
+                            <input
+                                type="text"
+                                value={filters.Category_ID}
+                                onChange={e => setFilters(f => ({ ...f, Category_ID: e.target.value }))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
+                                placeholder="Enter Category Id"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Type Id</label>
+                            <input
+                                type="text"
+                                value={filters.Type_ID}
+                                onChange={e => setFilters(f => ({ ...f, Type_ID: e.target.value }))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
+                                placeholder="Enter Type Id"
+                            />
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Type Title</label>
                             <input
                                 type="text"
@@ -215,19 +254,10 @@ const CategoryTypesRecords = ({
                                 placeholder="Enter Type Title"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Type Description</label>
-                            <input
-                                type="text"
-                                value={filters.Type_Description}
-                                onChange={e => setFilters(f => ({ ...f, Type_Description: e.target.value }))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
-                                placeholder="Enter Type Description"
-                            />
-                        </div>
+
                         <div className="flex items-end space-x-2">
                             <motion.button
-                                onClick={() => setFilters({ Type_Title: '', Type_Description: '' })}
+                                onClick={() => setFilters({ Category_ID: '', Type_ID: '', Type_Title: '' })}
                                 className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors text-sm"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}

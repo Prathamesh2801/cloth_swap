@@ -16,8 +16,9 @@ const FinalClothRecords = ({
 }) => {
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
+        Cloth_ID: '',
+        Type_ID: '',
         Cloth_Title: '',
-        Cloth_Description: ''
     });
     const [imageModal, setImageModal] = useState({ show: false, src: '', title: '' });
     const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -88,6 +89,7 @@ const FinalClothRecords = ({
     }, [onView]);
 
     const columnDefs = useMemo(() => [
+
         {
             headerName: 'Image',
             field: 'Image_URL',
@@ -96,6 +98,15 @@ const FinalClothRecords = ({
             sortable: false,
             filter: false
         },
+        {
+            headerName: 'Cloth ID',
+            field: 'Cloth_ID',
+            sortable: true,
+            filter: true,
+            cellClass: "flex items-center justify-start font-medium",
+        },
+
+
         {
             headerName: 'Cloths Title',
             field: 'Cloth_Title',
@@ -114,7 +125,13 @@ const FinalClothRecords = ({
             minWidth: 120,
             cellClass: "flex items-center justify-start text-gray-700 text-sm",
         },
-
+        {
+            headerName: 'Type ID',
+            field: 'Type_ID',
+            sortable: true,
+            filter: true,
+            cellClass: "flex items-center justify-start font-medium",
+        },
 
         {
             headerName: 'Actions',
@@ -135,9 +152,11 @@ const FinalClothRecords = ({
     // Filtering logic (optional, can be expanded)
     const filteredTypes = useMemo(() => {
         return types.filter(type => {
+            const ClothIdMatch = type.Cloth_ID.toLowerCase().includes(filters.Cloth_ID.toLowerCase());
+            const TypeIdMatch = type.Type_ID.toLowerCase().includes(filters.Type_ID.toLowerCase());
             const titleMatch = type.Cloth_Title.toLowerCase().includes(filters.Cloth_Title.toLowerCase());
-            const descMatch = type.Cloth_Description.toLowerCase().includes(filters.Cloth_Description.toLowerCase());
-            return titleMatch && descMatch;
+
+            return ClothIdMatch && TypeIdMatch && titleMatch;
         });
     }, [types, filters]);
 
@@ -146,6 +165,7 @@ const FinalClothRecords = ({
     const closeImageModal = () => {
         setImageModal({ show: false, src: '', title: '' });
     };
+
 
     return (
         <div className="space-y-4">
@@ -158,7 +178,7 @@ const FinalClothRecords = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <span className="font-medium">Total Types: {filteredTypes.length}</span>
-                        {(filters.Cloth_Title || filters.Cloth_Description) && (
+                        {(filters.Type_ID || filters.Cloth_ID || filters.Cloth_Title) && (
                             <span className="text-[#8B7355]">
                                 (Filtered from {types.length})
                             </span>
@@ -191,34 +211,45 @@ const FinalClothRecords = ({
                 {/* Filter Panel */}
                 {showFilters && (
                     <motion.div
-                        className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-2 gap-4"
+                        className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-3 gap-4"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                     >
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Type Title</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Type ID</label>
+                            <input
+                                type="text"
+                                value={filters.Type_ID}
+                                onChange={e => setFilters(f => ({ ...f, Type_ID: e.target.value }))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
+                                placeholder="Enter Type Id"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Cloth ID</label>
+                            <input
+                                type="text"
+                                value={filters.Cloth_ID}
+                                onChange={e => setFilters(f => ({ ...f, Cloth_ID: e.target.value }))}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
+                                placeholder="Enter Cloth Id"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Cloth Title</label>
                             <input
                                 type="text"
                                 value={filters.Cloth_Title}
                                 onChange={e => setFilters(f => ({ ...f, Cloth_Title: e.target.value }))}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
-                                placeholder="Enter Type Title"
+                                placeholder="Enter Cloth Title"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Type Description</label>
-                            <input
-                                type="text"
-                                value={filters.Cloth_Description}
-                                onChange={e => setFilters(f => ({ ...f, Cloth_Description: e.target.value }))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
-                                placeholder="Enter Type Description"
-                            />
-                        </div>
+
                         <div className="flex items-end space-x-2">
                             <motion.button
-                                onClick={() => setFilters({ Cloth_Title: '', Cloth_Description: '' })}
+                                onClick={() => setFilters({ Type_ID: '', Cloth_ID: '', Cloth_Title: '' })}
                                 className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors text-sm"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}

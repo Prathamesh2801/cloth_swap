@@ -158,11 +158,14 @@ export default function Dashboard() {
                                 <div className="flex h-full flex-col bg-[#2d1810] shadow-xl">
                                     {/* Close button */}
                                     <div className="flex items-center justify-between p-4">
-                                        <img
-                                            alt="Your Company"
-                                            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                                            className="h-8 w-auto"
-                                        />
+                                        <div className="mt-6 text-center">
+                                            <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
+                                                Cloth{" "}
+                                                <span className="bg-[#f84525] text-white px-2 rounded-md">
+                                                    Swap
+                                                </span>
+                                            </h2>
+                                        </div>
                                         <motion.button
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
@@ -175,7 +178,7 @@ export default function Dashboard() {
 
                                     {/* Navigation */}
                                     <nav className="flex-1 px-4 pb-4">
-                                        <ul className="space-y-2">
+                                        <ul className="space-y-4 mt-10">
                                             {navigation.map((item, index) => (
                                                 <motion.li
                                                     key={item.name}
@@ -194,6 +197,7 @@ export default function Dashboard() {
                                                                 : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                             'group flex items-center gap-x-3 rounded-md p-3 text-sm font-semibold transition-colors'
                                                         )}
+                                                        onClick={() => setSidebarOpen(false)}
                                                     >
                                                         <item.icon className="h-5 w-5 shrink-0" />
                                                         {item.name}
@@ -234,16 +238,15 @@ export default function Dashboard() {
                         <div className="flex h-16 shrink-0 items-center justify-between">
                             <AnimatePresence mode="wait">
                                 {!desktopSidebarCollapsed && (
-                                    <motion.img
-                                        key="logo"
-                                        variants={textVariants}
-                                        initial="hidden"
-                                        animate="visible"
-                                        exit="hidden"
-                                        alt="Your Company"
-                                        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                                        className="h-8 w-auto"
-                                    />
+                                   
+                                    <div className="mt-6 text-center ">
+                                        <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
+                                            Cloth{" "}
+                                            <span className="bg-[#f84525] text-white px-2 rounded-md">
+                                                Swap
+                                            </span>
+                                        </h2>
+                                    </div>
                                 )}
                             </AnimatePresence>
 
@@ -269,7 +272,7 @@ export default function Dashboard() {
                             <ul className="flex flex-1 flex-col gap-y-7">
                                 <li>
                                     <ul className={classNames(
-                                        "space-y-1",
+                                        "space-y-4 mt-5",
                                         desktopSidebarCollapsed ? "mx-0" : "-mx-2"
                                     )}>
                                         {navigation.map((item) => (
@@ -281,7 +284,7 @@ export default function Dashboard() {
                                                         item.current
                                                             ? 'bg-gray-700 text-white'
                                                             : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition-colors',
+                                                        'group flex gap-x-3  rounded-md p-2 text-sm font-semibold transition-colors',
                                                         desktopSidebarCollapsed ? 'justify-center' : ''
                                                     )}
                                                     title={desktopSidebarCollapsed ? item.name : undefined}

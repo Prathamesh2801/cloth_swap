@@ -51,6 +51,7 @@ export async function createFinalClothes(clothData) {
     formData.append("Type_ID", clothData.Type_ID);
     formData.append("Cloth_Title", clothData.Cloth_Title);
     formData.append("Cloth_Description", clothData.Cloth_Description || ""); // Optional field
+    formData.append("Swap_Type", clothData.Cloth_Swap_Type || "FULL");
     if (clothData.image) {
       formData.append("image", clothData.image);
     }

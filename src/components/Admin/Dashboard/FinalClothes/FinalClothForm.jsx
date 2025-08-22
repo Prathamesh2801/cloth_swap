@@ -10,11 +10,13 @@ const FinalClothForm = ({
     onCancel,
     mode = 'create'
 }) => {
+
     const [formData, setFormData] = useState({
         Cloth_Title: '',
         Cloth_Description: '',
         image: null,
-        Type_ID: ''
+        Type_ID: '',
+        Cloth_Swap_Type: 'FULL'
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -214,9 +216,9 @@ const FinalClothForm = ({
                 Cloth_Title: viewingCloth.Cloth_Title || '',
                 Cloth_Description: viewingCloth.Cloth_Description || '',
                 image: null,
-                Type_ID: viewingCloth.Type_ID || ''
+                Type_ID: viewingCloth.Type_ID || '',
+                Cloth_Swap_Type: viewingCloth.Cloth_Swap_Type || 'FULL'
             });
-
             // Set selected type and category if available
             if (viewingCloth.Type_ID && viewingCloth.Category_ID) {
                 const tempType = {
@@ -228,13 +230,11 @@ const FinalClothForm = ({
                     Category_ID: viewingCloth.Category_ID,
                     Category_Title: viewingCloth.Category_Title || viewingCloth.Category_ID
                 };
-
                 setSelectedType(tempType);
                 setSelectedCategory(tempCategory);
                 setTypeSearchTerm(tempType.Type_Title);
                 setCategorySearchTerm(tempCategory.Category_Title);
             }
-
             // Set image preview if exists
             if (viewingCloth.Image_URL) {
                 setImagePreview(BASE_URL + '/' + viewingCloth.Image_URL);
@@ -244,7 +244,8 @@ const FinalClothForm = ({
                 Cloth_Title: '',
                 Cloth_Description: '',
                 image: null,
-                Type_ID: ''
+                Type_ID: '',
+                Cloth_Swap_Type: 'FULL'
             });
             setSelectedCategory(null);
             setSelectedType(null);
@@ -360,6 +361,7 @@ const FinalClothForm = ({
         setIsSubmitting(true);
 
         try {
+            console.log("Before Formdata ", formData)
             await onSubmit(formData);
         } catch (error) {
             console.error('Form submission error:', error);
@@ -417,7 +419,7 @@ const FinalClothForm = ({
                 {/* Form Body */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {/* Category Selection Field */}
-                    <div className="space-y-2">
+                    {!isViewMode && <div className="space-y-2">
                         <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                             <Search className="h-4 w-4" />
                             <span>Category *</span>
@@ -481,10 +483,10 @@ const FinalClothForm = ({
                                 <span>{errors.Category_ID}</span>
                             </motion.p>
                         )}
-                    </div>
+                    </div>}
 
                     {/* Type Selection Field */}
-                    <div className="space-y-2">
+                    {!isViewMode && <div className="space-y-2">
                         <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                             <Layers className="h-4 w-4" />
                             <span>Type *</span>
@@ -548,7 +550,25 @@ const FinalClothForm = ({
                                 <span>{errors.Type_ID}</span>
                             </motion.p>
                         )}
-                    </div>
+                    </div>}
+
+                    {/* Cloth ID Field (View Mode Only) */}
+                    {isViewMode && viewingCloth && (
+                        <div className="space-y-2">
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                </svg>
+                                <span>Cloth ID</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={viewingCloth.Cloth_ID || ''}
+                                disabled
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed text-gray-500"
+                            />
+                        </div>
+                    )}
 
                     {/* Image Upload Section */}
                     <div className="flex flex-col items-center justify-center space-y-4 w-full">
@@ -637,6 +657,25 @@ const FinalClothForm = ({
                         )}
                     </div>
 
+
+                    {/* Cloth Swap Type Field */}
+                    <div className="space-y-2">
+                        <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                            <span>Cloth Swap Type *</span>
+                        </label>
+                        <select
+                            name="Cloth_Swap_Type"
+                            value={formData.Cloth_Swap_Type}
+                            onChange={handleInputChange}
+                            disabled={isViewMode}
+                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+                        >
+                            <option value="FULL">FULL</option>
+                            <option value="TOP">TOP</option>
+                        </select>
+                    </div>
+
+
                     {/* Cloth Title Field */}
                     <div className="space-y-2">
                         <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
@@ -693,23 +732,7 @@ const FinalClothForm = ({
                         )}
                     </div>
 
-                    {/* Cloth ID Field (View Mode Only) */}
-                    {isViewMode && viewingCloth && (
-                        <div className="space-y-2">
-                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                                </svg>
-                                <span>Cloth ID</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={viewingCloth.Cloth_ID || ''}
-                                disabled
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed text-gray-500"
-                            />
-                        </div>
-                    )}
+
 
                     {/* Form Actions */}
                     {!isViewMode && (

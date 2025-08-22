@@ -113,7 +113,7 @@ const FinalClothManage = () => {
                     {currentView === 'records' ? (
                         <FinalClothRecords types={types} loading={loading} onView={handleViewType} onDelete={handleDeleteType} onRefresh={fetchTypes} />
                     ) : (
-                        <FinalClothForm viewingType={viewingType} onSubmit={handleCreateType} onCancel={handleFormCancel} mode={formMode} />
+                        <FinalClothForm viewingCloth={viewingType} onSubmit={handleCreateType} onCancel={handleFormCancel} mode={formMode} />
                     )}
                 </AnimatePresence>
             </div>

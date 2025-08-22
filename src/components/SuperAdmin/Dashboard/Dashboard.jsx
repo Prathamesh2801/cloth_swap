@@ -13,7 +13,7 @@ function classNames(...classes) {
 
 export default function Dashboard() {
     const location = useLocation();
-   
+
     const queryParams = new URLSearchParams(location.search);
     const activeTab = queryParams.get("tab") || "dashboard";
 
@@ -192,6 +192,7 @@ export default function Dashboard() {
                                                                 : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                             'group flex items-center gap-x-3 rounded-md p-3 text-sm font-semibold transition-colors'
                                                         )}
+                                                        onClick={() => setSidebarOpen(false)}
                                                     >
                                                         <item.icon className="h-5 w-5 shrink-0" />
                                                         {item.name}
