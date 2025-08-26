@@ -1,7 +1,13 @@
 // src/api/finalClothSwap.js
-import { BASE_URL } from "../../config";
-import base64ToFile from "../helper/base64ToFile";
+import { BASE_URL } from "../../../config";
 
+
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
 /** parse a single SSE block text to {event, dataStr} */
 function parseSSEBlock(block) {
   const lines = block.split(/\r?\n/).filter(Boolean);
@@ -20,8 +26,6 @@ function parseSSEBlock(block) {
 
 export async function startSSEProcess(
   person,
-  gender,
-  type,
   clothId,
   onMessage,
   onError,
@@ -30,13 +34,14 @@ export async function startSSEProcess(
   try {
     const formData = new FormData();
     formData.append("person", person);
-    formData.append("gender", gender);
-    formData.append("type", type);
-    formData.append("clothId", clothId);
+  
+    formData.append("Cloth_ID", clothId);
 
-    const resp = await fetch(`${BASE_URL}/sse_process.php`, {
+    const resp = await fetch(`${BASE_URL}/device/sse_process.php`,
+       {
       method: "POST",
       body: formData,
+      headers: getAuthHeaders(),
       // credentials: 'include' // uncomment if needed
     });
 

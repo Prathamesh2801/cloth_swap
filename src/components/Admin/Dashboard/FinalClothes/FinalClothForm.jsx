@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Save, X, Upload, Image as ImageIcon, Eye, Package, ChevronDown, Search, Layers } from 'lucide-react';
 import { BASE_URL } from '../../../../../config';
 import { getCategoriesTypes } from '../../../../api/Client/CategoryTypesAPI';
+import { getCategories } from '../../../../api/Client/CategoryAPI';
 
 const FinalClothForm = ({
     viewingCloth,
@@ -16,7 +17,8 @@ const FinalClothForm = ({
         Cloth_Description: '',
         image: null,
         Type_ID: '',
-        Cloth_Swap_Type: 'FULL'
+        Cloth_Swap_Type: 'FULL',
+        Cloth_Size: 'XS'
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,7 +73,7 @@ const FinalClothForm = ({
     const loadCategories = async () => {
         try {
             setLoadingCategories(true);
-            const response = await getCategoriesTypes('', null, null, null);
+            const response = await getCategories();
             if (response.Status && response.Data) {
                 // Extract unique categories from the response
                 const uniqueCategories = response.Data.reduce((acc, item) => {
@@ -80,6 +82,7 @@ const FinalClothForm = ({
                         acc.push({
                             Category_ID: item.Category_ID,
                             Category_Title: item.Category_Title,
+
                             Shop_Name: item.Shop_Name
                         });
                     }
@@ -99,7 +102,7 @@ const FinalClothForm = ({
     const loadTypes = async (categoryId) => {
         try {
             setLoadingTypes(true);
-            const response = await getCategoriesTypes('', null, null, categoryId);
+            const response = await getCategoriesTypes(null, categoryId);
             if (response.Status && response.Data) {
                 // Extract types from the response for the selected category
                 const categoryTypes = response.Data.map(item => ({
@@ -217,7 +220,8 @@ const FinalClothForm = ({
                 Cloth_Description: viewingCloth.Cloth_Description || '',
                 image: null,
                 Type_ID: viewingCloth.Type_ID || '',
-                Cloth_Swap_Type: viewingCloth.Cloth_Swap_Type || 'FULL'
+                Cloth_Swap_Type: viewingCloth.Cloth_Swap_Type || 'FULL',
+                Cloth_Size: viewingCloth.Cloth_Size || 'XS'
             });
             // Set selected type and category if available
             if (viewingCloth.Type_ID && viewingCloth.Category_ID) {
@@ -245,7 +249,8 @@ const FinalClothForm = ({
                 Cloth_Description: '',
                 image: null,
                 Type_ID: '',
-                Cloth_Swap_Type: 'FULL'
+                Cloth_Swap_Type: 'FULL',
+                Cloth_Size: 'XS'
             });
             setSelectedCategory(null);
             setSelectedType(null);
@@ -361,7 +366,7 @@ const FinalClothForm = ({
         setIsSubmitting(true);
 
         try {
-            console.log("Before Formdata ", formData)
+
             await onSubmit(formData);
         } catch (error) {
             console.error('Form submission error:', error);
@@ -575,7 +580,7 @@ const FinalClothForm = ({
                         {/* Label */}
                         <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                             <ImageIcon className="h-4 w-4" />
-                            <span>Cloth Image (Optional)</span>
+                            <span>Cloth Image </span>
                         </label>
 
                         {/* Image Preview + Upload */}
@@ -672,6 +677,28 @@ const FinalClothForm = ({
                         >
                             <option value="FULL">FULL</option>
                             <option value="TOP">TOP</option>
+                        </select>
+                    </div>
+
+                    {/* Cloth Size Type Field */}
+                    <div className="space-y-2">
+                        <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                            <span>Cloth Swap Size *</span>
+                        </label>
+                        <select
+                            name="Cloth_Size"
+                            value={formData.Cloth_Size}
+                            onChange={handleInputChange}
+                            disabled={isViewMode}
+                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+                        >
+                          
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
                         </select>
                     </div>
 

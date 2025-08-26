@@ -219,7 +219,7 @@ const CategoryTypesRecords = ({
                 {/* Filter Panel */}
                 {showFilters && (
                     <motion.div
-                        className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-2 gap-4"
+                        className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-4 gap-4"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
@@ -258,7 +258,7 @@ const CategoryTypesRecords = ({
                         <div className="flex items-end space-x-2">
                             <motion.button
                                 onClick={() => setFilters({ Category_ID: '', Type_ID: '', Type_Title: '' })}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+                                className="px-4 py-2 text-gray-600  hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors text-sm"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >

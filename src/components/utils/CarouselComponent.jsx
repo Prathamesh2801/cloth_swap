@@ -7,7 +7,8 @@ const cardWidth = 280; // matches class "w-70"
 const gapWidth = 16; // tailwind gap-4 = 1rem = 16px
 const fullCardWidth = cardWidth + gapWidth;
 
-export default function Carousel({ items }) {
+export default function Carousel({ items, onItemClick }) {
+  console.log("Carousel items:", items);
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [favorites, setFavorites] = useState(new Set());
@@ -85,11 +86,12 @@ export default function Carousel({ items }) {
               className="flex-shrink-0 w-[280px] bg-white rounded-2xl shadow-lg border border-[#d4b896]/20 overflow-hidden"
               whileHover={{ y: -5 }}
               transition={{ duration: 0.2 }}
+              onClick={() => onItemClick?.(item)}
             >
               <div className="relative">
                 <img
-                  src={BASE_URL + '/'+ item.image}
-                  alt={BASE_URL +'/'+ item.image}
+                  src={BASE_URL + '/' + item.image}
+                  alt={BASE_URL + '/' + item.image}
                   className="w-full h-48 object-contain"
                 />
                 <motion.button

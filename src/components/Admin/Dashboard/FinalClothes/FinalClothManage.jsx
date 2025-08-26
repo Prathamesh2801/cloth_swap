@@ -32,10 +32,12 @@ const FinalClothManage = () => {
     };
 
     const handleCreateType = async (typeData) => {
+        console.log("Creating type with data:", typeData);
         const promise = createFinalClothes(typeData);
         toast.promise(promise, {
             loading: 'Creating type...',
             success: (response) => {
+
                 if (response.Status) {
                     fetchTypes();
                     setCurrentView('records');

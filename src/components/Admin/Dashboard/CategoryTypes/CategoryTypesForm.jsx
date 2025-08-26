@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Save, X, Upload, Image as ImageIcon, Eye, Edit3, Package, ChevronDown, Search } from 'lucide-react';
 import { BASE_URL } from '../../../../../config';
-import { getCategoriesTypes } from '../../../../api/Client/CategoryTypesAPI';
+import { getCategories } from '../../../../api/Client/CategoryAPI';
 
 const CategoryTypesForm = ({
   editingType,
@@ -59,22 +59,19 @@ const CategoryTypesForm = ({
   const loadCategories = async () => {
     try {
       setLoadingCategories(true);
-      const response = await getCategoriesTypes('', null, null, null);
+      const response = await getCategories();
+      console.log("Categories API Response:", response);
+
       if (response.Status && response.Data) {
-        // Extract unique categories from the response
-        const uniqueCategories = response.Data.reduce((acc, item) => {
-          const existingCategory = acc.find(cat => cat.Category_ID === item.Category_ID);
-          if (!existingCategory) {
-            acc.push({
-              Category_ID: item.Category_ID,
-              Category_Title: item.Category_Title,
-              Shop_Name: item.Shop_Name
-            });
-          }
-          return acc;
-        }, []);
-        setCategories(uniqueCategories);
-        setFilteredCategories(uniqueCategories);
+        // If response.Data already has all categories
+        const categoriesList = response.Data.map(item => ({
+          Category_ID: item.Category_ID,
+          Category_Title: item.Category_Title,
+          Shop_Name: item.Shop_Name
+        }));
+
+        setCategories(categoriesList);
+        setFilteredCategories(categoriesList);
       }
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -83,20 +80,21 @@ const CategoryTypesForm = ({
     }
   };
 
+
   // Simple fuzzy search implementation
   const fuzzySearch = (items, searchTerm) => {
     if (!searchTerm) return items;
-    
+
     const term = searchTerm.toLowerCase();
     return items.filter(item => {
       const title = item.Category_Title.toLowerCase();
       const id = item.Category_ID.toLowerCase();
-      
+
       // Exact match gets highest priority
       if (title.includes(term) || id.includes(term)) {
         return true;
       }
-      
+
       // Character-by-character fuzzy match
       let termIndex = 0;
       for (let i = 0; i < title.length && termIndex < term.length; i++) {
@@ -111,7 +109,7 @@ const CategoryTypesForm = ({
       const bTitle = b.Category_Title.toLowerCase();
       const aExact = aTitle.includes(term);
       const bExact = bTitle.includes(term);
-      
+
       if (aExact && !bExact) return -1;
       if (!aExact && bExact) return 1;
       return aTitle.localeCompare(bTitle);
@@ -134,7 +132,7 @@ const CategoryTypesForm = ({
     }));
     setCategorySearchTerm(category.Category_Title);
     setShowCategoryDropdown(false);
-    
+
     // Clear category error
     if (errors.Category_ID) {
       setErrors(prev => ({ ...prev, Category_ID: '' }));
@@ -381,9 +379,8 @@ const CategoryTypesForm = ({
             </label>
             <div className="relative" ref={categoryDropdownRef}>
               <div
-                className={`w-full px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
-                  errors.Category_ID ? 'border-red-500' : 'border-gray-300'
-                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : 'hover:border-[#8B7355] focus-within:ring-2 focus-within:ring-[#8B7355] focus-within:border-transparent'}`}
+                className={`w-full px-4 py-3 border rounded-lg cursor-pointer transition-colors ${errors.Category_ID ? 'border-red-500' : 'border-gray-300'
+                  } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : 'hover:border-[#8B7355] focus-within:ring-2 focus-within:ring-[#8B7355] focus-within:border-transparent'}`}
                 onClick={() => !isViewMode && setShowCategoryDropdown(!showCategoryDropdown)}
               >
                 <div className="flex items-center justify-between">
@@ -540,9 +537,8 @@ const CategoryTypesForm = ({
               value={formData.Type_Title}
               onChange={handleInputChange}
               disabled={isViewMode}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${
-                errors.Type_Title ? 'border-red-500' : 'border-gray-300'
-              } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${errors.Type_Title ? 'border-red-500' : 'border-gray-300'
+                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
               placeholder="Enter type title"
             />
             {errors.Type_Title && (
@@ -568,9 +564,8 @@ const CategoryTypesForm = ({
               onChange={handleInputChange}
               disabled={isViewMode}
               rows={3}
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors resize-none ${
-                errors.Type_Description ? 'border-red-500' : 'border-gray-300'
-              } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors resize-none ${errors.Type_Description ? 'border-red-500' : 'border-gray-300'
+                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
               placeholder="Enter type description (optional)"
             />
             {errors.Type_Description && (

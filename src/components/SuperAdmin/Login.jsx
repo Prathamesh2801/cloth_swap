@@ -15,11 +15,14 @@ export default function Login() {
     const role = localStorage.getItem("role");
     if (token) {
       if (role === "Super_Admin") {
-
         navigate("/sa/dashboard", { replace: true });
       }
-      else {
+      
+      else if (role === "Admin") {
         navigate("/client/dashboard", { replace: true });
+      }
+      else{
+        navigate("/startup", { replace: true });
       }
     }
   }, [navigate]);

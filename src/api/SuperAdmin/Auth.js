@@ -9,8 +9,8 @@ export async function login(username, password) {
     const response = await axios.post(`${BASE_URL}/log.php`, formData);
     console.log("Login response:", response.data);
     if (response.data.Status === true) {
-      localStorage.setItem("token", response.data.Token);
-      localStorage.setItem("role", response.data.Role);
+      localStorage.setItem("token", response.data.Token || "");
+      localStorage.setItem("role", response.data.Role   || "");
       return response.data;
     } else {
       throw new Error(

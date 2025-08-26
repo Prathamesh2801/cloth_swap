@@ -6,43 +6,36 @@ import PageHeader from "./utils/PageHeader";
 import MasonryGrid from "./utils/MasonryGrid";
 import bannerD from "../assets/img/SelectCloth/bannerD.png";
 import { fetchTypeClothes } from "../api/fetchClothes";
+import { fetchClothByCategoryTypes } from "../api/Device/fetchDeviceClothes";
 
 export default function SelectClothTypeScreen() {
   const navigate = useNavigate();
-
   const location = useLocation();
-  const { clothCategory, clothType } = location.state
-
+  const categoryId = location.state
   const [isTransitioning, setIsTransitioning] = useState(false);
   // { type: "forward", path, state } or { type: "back" }
   const [nextAction, setNextAction] = useState(null);
   const [clothTypes, setClothTypes] = useState([])
-  async function getTypeClothes(category, type) {
-
-    const response = await fetchTypeClothes(category, type);
-    const formatted = response.Items.map((item) => ({
-      id: item.ID,
-      name: item.Name,
-      image: item.Image,
-      description: item.Description
+  async function getTypeClothes(categoryID) {
+    const response = await fetchClothByCategoryTypes(categoryID);
+    const formatted = response.Data.map((item) => ({
+      id: item.Type_ID,
+      name: item.Type_Title,
+      image: item.Image_URL,
+      description: item.Type_Description
     }))
     setClothTypes(formatted)
   }
   useEffect(() => {
-    getTypeClothes(clothCategory, clothType)
+    getTypeClothes(categoryId)
   }, [])
-
 
 
   const handleItemClick = (item) => {
     setNextAction({
       type: "forward",
       path: `/camera`,
-      state: {
-        clothCategory: clothCategory,
-        clothType: clothType,
-        swapCloth: item.id
-      },
+      state: {categoryId , typeId: item.id },
     });
     setIsTransitioning(true);
   };
@@ -82,7 +75,8 @@ export default function SelectClothTypeScreen() {
       >
         <div className="container mx-auto py-6">
           <PageHeader
-            title={`Select ${clothType} Type`}
+            // title={`Select ${clothTypes.Type_Title  } Type`}
+            title={`Select  Type`}
             subtitle="Choose your preferred style"
             onBack={handleBack}
             bannerImage={bannerD}

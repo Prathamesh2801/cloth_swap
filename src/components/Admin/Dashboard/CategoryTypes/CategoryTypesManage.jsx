@@ -9,7 +9,7 @@ import {
     getCategoriesTypes,
     createCategoryTypes,
     updateCategoryTypes,
-    updateCategoryTypesWithImage,
+
     deleteCategoryTypes
 } from '../../../../api/Client/CategoryTypesAPI';
 
@@ -48,7 +48,7 @@ const CategoryTypesManage = () => {
             const response = await getCategoriesTypes(null, null, null, null);
             if (response.Status) {
                 setTypes(response.Data || []);
-                
+
             } else {
                 toast.error(response.Message || 'Failed to fetch types');
             }
@@ -78,10 +78,9 @@ const CategoryTypesManage = () => {
     };
 
     const handleUpdateType = async (updateData) => {
-        const hasImage = updateData.image instanceof File;
-        const promise = hasImage
-            ? updateCategoryTypesWithImage(updateData)
-            : updateCategoryTypes(updateData);
+
+        const promise = updateCategoryTypes(updateData);
+
         toast.promise(promise, {
             loading: 'Updating type...',
             success: (response) => {
@@ -162,7 +161,7 @@ const CategoryTypesManage = () => {
                             <Package className="h-6 w-6 md:h-7 md:w-7 text-[#8B7355]" />
                             <div>
                                 <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-                                     Types Management
+                                    Types Management
                                 </h1>
                                 <p className="text-sm text-gray-600 mt-1">
                                     {currentView === 'records' ? 'Manage category types' : getHeaderSubtitle(formMode)}
@@ -215,7 +214,7 @@ const CategoryTypesManage = () => {
                                 viewingType={viewingType}
                                 onSubmit={formMode === 'edit' ? handleUpdateType : handleCreateType}
                                 onCancel={handleFormCancel}
-                                
+
                                 mode={formMode}
                             />
                         </motion.div>

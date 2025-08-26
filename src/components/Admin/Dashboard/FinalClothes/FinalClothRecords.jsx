@@ -117,6 +117,14 @@ const FinalClothRecords = ({
             cellClass: "flex items-center justify-start font-medium",
         },
         {
+            headerName: 'Cloths Size',
+            field: 'Cloth_Size',
+            sortable: true,
+            filter: true,
+            width: 150,
+            cellClass: "flex items-center justify-center font-medium",
+        },
+        {
             headerName: 'Cloth Description',
             field: 'Cloth_Description',
             sortable: true,
@@ -211,7 +219,7 @@ const FinalClothRecords = ({
                 {/* Filter Panel */}
                 {showFilters && (
                     <motion.div
-                        className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-3 gap-4"
+                        className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-4 gap-4"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}

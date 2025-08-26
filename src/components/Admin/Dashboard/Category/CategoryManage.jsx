@@ -18,7 +18,6 @@ const CategoryManage = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [viewingCategory, setViewingCategory] = useState(null);
   const [formMode, setFormMode] = useState('create'); // 'create', 'edit', 'view'
-  const userRole = localStorage.getItem('role');
 
 
   // Fetch categories on component mount
@@ -64,11 +63,9 @@ const CategoryManage = () => {
 
   const handleUpdateCategory = async (updateData) => {
     const promise = updateCategory(updateData);
-
     toast.promise(promise, {
       loading: 'Updating category...',
       success: (response) => {
-        console.log("Update response:", response);
         if (response.Status) {
           fetchCategories();
           setCurrentView('records');

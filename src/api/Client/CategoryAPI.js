@@ -14,9 +14,6 @@ function getShopIdAndUserRole() {
   const shopId = localStorage.getItem("shopId");
   const role = localStorage.getItem("role");
 
-  if (!shopId) {
-    throw new Error("Shop ID not found in localStorage");
-  }
   if (!role) {
     throw new Error("User role not found in localStorage");
   }
@@ -56,6 +53,12 @@ export async function createCategory(categoryData) {
     const formData = new FormData();
     formData.append("Category_Title", categoryData.Category_Title);
     formData.append("Gender", categoryData.Gender);
+    if (categoryData.Category_Description) {
+      formData.append(
+        "Category_Description",
+        categoryData.Category_Description
+      );
+    }
     if (categoryData.image) {
       formData.append("image", categoryData.image);
     }
@@ -85,13 +88,15 @@ export async function createCategory(categoryData) {
 export async function updateCategory(updateData) {
   try {
     const formData = new FormData();
-
     // Always include Category_ID
     formData.append("Category_ID", updateData.Category_ID);
 
     // Conditionally append fields (only if provided)
     if (updateData.Category_Title) {
       formData.append("Category_Title", updateData.Category_Title);
+    }
+    if (updateData.Category_Description) {
+      formData.append("Category_Description", updateData.Category_Description);
     }
     if (updateData.Gender) {
       formData.append("Gender", updateData.Gender);
@@ -105,13 +110,16 @@ export async function updateCategory(updateData) {
       formData.append("Shop_ID", getShopIdAndUserRole().shopId);
     }
 
-    const response = axios.put(`${BASE_URL}/Admin/category.php`, formData, {
-      headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
+    const response = await axios.put(
+      `${BASE_URL}/Admin/category.php`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating category:", error);

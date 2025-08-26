@@ -17,7 +17,7 @@ export default function App() {
     <HashRouter>
       <Toaster position="top-right" />
       <Routes>
-        <Route path="/" element={<Startup />} />
+        <Route path="/startup" element={<Startup />} />
         <Route path="/select-cloth" element={<SelectClothScreen />} />
         <Route
           path="/select-cloth-type/:clothId"
@@ -26,8 +26,9 @@ export default function App() {
         <Route path="/camera" element={<CameraSection />} />
         <Route path="/final" element={<FinalPreviewScreen />} />
 
-        {/*  ===========================  Super Admin Side  ========================= */}
         <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Login />} />
+        {/*  ===========================  Super Admin Side  ========================= */}
         <Route path="/sa/dashboard" element={<ProtectedSARoutes><Dashboard /></ProtectedSARoutes>} />
 
 

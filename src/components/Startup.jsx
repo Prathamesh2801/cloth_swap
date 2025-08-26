@@ -116,7 +116,7 @@ export default function Startup() {
                     }`}
                   style={{
                     background: "linear-gradient(145deg, #4F46E5, #3730A3)",
-                    boxShadow: isPressed.male
+                    boxShadow: isPressed.Male
                       ? "inset 8px 8px 16px rgba(0,0,0,0.2), inset -8px -8px 16px rgba(255,255,255,0.1)"
                       : "12px 12px 24px rgba(0,0,0,0.15), -12px -12px 24px rgba(255,255,255,0.1)",
                   }}
@@ -142,7 +142,7 @@ export default function Startup() {
                     }`}
                   style={{
                     background: "linear-gradient(145deg, #EC4899, #BE185D)",
-                    boxShadow: isPressed.female
+                    boxShadow: isPressed.Female
                       ? "inset 8px 8px 16px rgba(0,0,0,0.2), inset -8px -8px 16px rgba(255,255,255,0.1)"
                       : "12px 12px 24px rgba(0,0,0,0.15), -12px -12px 24px rgba(255,255,255,0.1)",
                   }}

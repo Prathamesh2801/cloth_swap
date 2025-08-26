@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronLeft, ChevronRight, Boxes, Layers, Shirt } from 'lucide-react'
+import { Menu, X, ChevronLeft, ChevronRight, Boxes, Layers, Shirt, LogOut } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import CategoryManage from './Category/CategoryManage'
 import CategoryTypesManage from './CategoryTypes/CategoryTypesManage'
@@ -12,7 +12,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Dashboard() {
+export default function ClientDashboard() {
     const location = useLocation();
 
     const queryParams = new URLSearchParams(location.search);
@@ -214,17 +214,13 @@ export default function Dashboard() {
 
                                     {/* User profile */}
                                     <div className="border-t border-gray-700 p-4">
-                                        <button
+                                       <button
+
                                             onClick={logout}
-                                           
-                                            className="flex items-center gap-x-3 rounded-md p-3 text-sm font-semibold text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                                            className="flex bg-[#f7f2e5]  items-center gap-x-3 rounded-md p-3 text-sm font-semibold text-red-500 hover:bg-gray-700 hover:text-white transition-colors"
                                         >
-                                            <img
-                                                alt="Profile"
-                                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                                className="h-8 w-8 rounded-full"
-                                            />
-                                            <span>Tom Cook</span>
+                                            <LogOut className='' />
+                                            <span>Logout</span>
                                         </button>
                                     </div>
                                 </div>
@@ -329,11 +325,7 @@ export default function Dashboard() {
                                         )}
                                         title={desktopSidebarCollapsed ? "Tom Cook" : undefined}
                                     >
-                                        <img
-                                            alt="Profile"
-                                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                            className="h-8 w-8 rounded-full"
-                                        />
+                                        <LogOut className="h-6 w-6 shrink-0 text-red-500" />
                                         <AnimatePresence mode="wait">
                                             {!desktopSidebarCollapsed && (
                                                 <motion.span
@@ -342,7 +334,7 @@ export default function Dashboard() {
                                                     animate="visible"
                                                     exit="hidden"
                                                 >
-                                                    Tom Cook
+                                                   Logout
                                                 </motion.span>
                                             )}
                                         </AnimatePresence>

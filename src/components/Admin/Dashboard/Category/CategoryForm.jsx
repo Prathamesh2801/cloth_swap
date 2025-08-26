@@ -12,6 +12,7 @@ const CategoryForm = ({
 }) => {
   const [formData, setFormData] = useState({
     Category_Title: '',
+    Category_Description: '',
     Gender: '',
     image: null
   });
@@ -32,6 +33,7 @@ const CategoryForm = ({
     if ((isEditMode || isViewMode) && categoryData) {
       setFormData({
         Category_Title: categoryData.Category_Title || '',
+        Category_Description: categoryData.Category_Description || '',
         Gender: categoryData.Gender || '',
         image: null // Don't set the image file, just show preview
       });
@@ -160,6 +162,7 @@ const CategoryForm = ({
         const editData = {
           Category_ID: editingCategory.Category_ID,
           Category_Title: formData.Category_Title,
+          Category_Description: formData.Category_Description,
           Gender: formData.Gender
         };
 
@@ -350,6 +353,33 @@ const CategoryForm = ({
                 animate={{ opacity: 1, y: 0 }}
               >
                 <span>{errors.Category_Title}</span>
+              </motion.p>
+            )}
+          </div>
+
+          {/* Category Description Field */}
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <Package className="h-4 w-4" />
+              <span>Category Description</span>
+            </label>
+            <input
+              type="text"
+              name="Category_Description"
+              value={formData.Category_Description}
+              onChange={handleInputChange}
+              disabled={isViewMode}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent transition-colors ${errors.Category_Title ? 'border-red-500' : 'border-gray-300'
+                } ${isViewMode ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+              placeholder="Enter category description (optional)"
+            />
+            {errors.Category_Description && (
+              <motion.p
+                className="text-red-500 text-sm flex items-center space-x-1"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <span>{errors.Category_Description}</span>
               </motion.p>
             )}
           </div>

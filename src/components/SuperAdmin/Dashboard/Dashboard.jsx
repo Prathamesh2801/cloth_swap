@@ -4,6 +4,7 @@ import { Menu, X, Home, Users, Store, ChevronLeft, ChevronRight, LogOut } from '
 import { useLocation } from 'react-router-dom'
 import ShopManage from './Shop/ShopManage'
 import UserManage from './User/UserManager'
+import VisualsManage from './Stats/VisualsManage'
 
 
 
@@ -124,13 +125,13 @@ export default function Dashboard() {
     const renderContent = () => {
         switch (activeTab) {
             case "dashboard":
-                return <div>Dashboard Overview</div>;
+                return <VisualsManage />;
             case "users":
                 return <UserManage />;
             case "shop":
                 return <ShopManage />;
             default:
-                return <div>Dashboard Overview</div>;
+                return <VisualsManage />;
         }
     };
 
@@ -160,11 +161,14 @@ export default function Dashboard() {
                                 <div className="flex h-full flex-col bg-[#2d1810] shadow-xl">
                                     {/* Close button */}
                                     <div className="flex items-center justify-between p-4">
-                                        <img
-                                            alt="Your Company"
-                                            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                                            className="h-8 w-auto"
-                                        />
+                                        <div className="mt-6 text-center">
+                                            <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
+                                                Cloth{" "}
+                                                <span className="bg-[#f84525] text-white px-2 rounded-md">
+                                                    Swap
+                                                </span>
+                                            </h2>
+                                        </div>
                                         <motion.button
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
@@ -234,16 +238,14 @@ export default function Dashboard() {
                         <div className="flex h-16 shrink-0 items-center justify-between">
                             <AnimatePresence mode="wait">
                                 {!desktopSidebarCollapsed && (
-                                    <motion.img
-                                        key="logo"
-                                        variants={textVariants}
-                                        initial="hidden"
-                                        animate="visible"
-                                        exit="hidden"
-                                        alt="Your Company"
-                                        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                                        className="h-8 w-auto"
-                                    />
+                                      <div className="mt-6 text-center">
+                                            <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
+                                                Cloth{" "}
+                                                <span className="bg-[#f84525] text-white px-2 rounded-md">
+                                                    Swap
+                                                </span>
+                                            </h2>
+                                        </div>
                                 )}
                             </AnimatePresence>
 

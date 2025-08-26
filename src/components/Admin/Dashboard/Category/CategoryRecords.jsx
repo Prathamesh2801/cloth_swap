@@ -17,6 +17,7 @@ const CategoryRecords = ({
 }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
+    Category_ID: '',
     Gender: '',
     Category_Title: ''
   });
@@ -151,8 +152,18 @@ const CategoryRecords = ({
       sortable: true,
       filter: true,
       flex: 1,
-      minWidth: 200,
+      minWidth: 100,
       cellStyle: { fontWeight: '500' },
+      cellClass: "flex items-center justify-start text-gray-700 text-sm",
+    },
+    {
+      headerName: 'Category Description',
+      field: 'Category_Description',
+      sortable: true,
+      filter: true,
+      flex: 1,
+      minWidth: 250,
+
       cellClass: "flex items-center justify-start text-gray-700 text-sm",
     },
     {
@@ -185,12 +196,15 @@ const CategoryRecords = ({
   // Filter categories based on local filters
   const filteredCategories = useMemo(() => {
     return categories.filter(category => {
+      const matchesId = !filters.Category_ID ||
+        category.Category_ID?.toString().includes(filters.Category_ID.toString());
       const matchesGender = !filters.Gender ||
-        category.Gender?.toLowerCase().includes(filters.Gender.toLowerCase());
+        category.Gender?.toString().trim().toLowerCase() === filters.Gender.trim().toLowerCase();
+
       const matchesTitle = !filters.Category_Title ||
         category.Category_Title?.toLowerCase().includes(filters.Category_Title.toLowerCase());
 
-      return matchesGender && matchesTitle;
+      return matchesId && matchesGender && matchesTitle;
     });
   }, [categories, filters]);
 
@@ -199,7 +213,7 @@ const CategoryRecords = ({
   };
 
   const handleFilterReset = () => {
-    setFilters({ Gender: '', Category_Title: '' });
+    setFilters({ Category_ID: '', Gender: '', Category_Title: '' });
   };
 
   const closeImageModal = () => {
@@ -217,7 +231,7 @@ const CategoryRecords = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <span className="font-medium">Total Categories: {filteredCategories.length}</span>
-            {(filters.Gender || filters.Category_Title) && (
+            {(filters.Category_ID || filters.Gender || filters.Category_Title) && (
               <span className="text-[#8B7355]">
                 (Filtered from {categories.length})
               </span>
@@ -253,11 +267,21 @@ const CategoryRecords = ({
         {/* Filter Panel */}
         {showFilters && (
           <motion.div
-            className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="mt-4 pt-4 border-t border-[#e8dabe] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4  gap-4"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category ID</label>
+              <input
+                type="text"
+                value={filters.Category_ID}
+                onChange={(e) => handleFilterChange('Category_ID', e.target.value)}
+                placeholder="Search by ID"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] focus:border-transparent"
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
               <select

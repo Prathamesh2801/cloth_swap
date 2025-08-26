@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function CameraSection() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { clothCategory, clothType, swapCloth } = location.state || {};
+  const {categoryId , typeId} = location.state;
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextAction, setNextAction] = useState(null);
 
@@ -19,10 +19,9 @@ export default function CameraSection() {
       type: "forward",
       path: "/final",
       state: {
-        clothCategory,
-        clothType,
-        swapCloth,
-        capturedImage: file
+        typeId: typeId,
+        capturedImage: file,
+        categoryId: categoryId
       },
     });
     setIsTransitioning(true);

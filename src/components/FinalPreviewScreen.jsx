@@ -1,35 +1,22 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
   XMarkIcon,
-  HeartIcon,
   ShareIcon,
   ShoppingBagIcon,
 } from "@heroicons/react/24/outline";
-import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
+
 import PageHeader from "./utils/PageHeader";
 import PageTransitionLoader from "./PageTransitionLoader";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingScreen from "./LoadingScreen";
-import finalModalPreview from "../assets/img/FinalSection/final_preview.jpg";
-import Sample1 from "../assets/img/FinalSection/s1.png";
-import Sample2 from "../assets/img/FinalSection/s2.png";
-import Sample3 from "../assets/img/FinalSection/s3.png";
-import Sample4 from "../assets/img/FinalSection/s4.png";
-import Sample5 from "../assets/img/FinalSection/s5.png";
-import Sample6 from "../assets/img/FinalSection/s6.png";
-import Sample7 from "../assets/img/FinalSection/s7.png";
-import Sample8 from "../assets/img/FinalSection/s8.png";
-import Sample9 from "../assets/img/FinalSection/s9.png";
 import bannerD from "../assets/img/SelectCloth/bannerD.png";
 
 import MasonryGrid from "./utils/MasonryGrid";
 import CarouselComponent from "./utils/CarouselComponent";
 
-import { startSSEProcess } from "../api/finalClothSwap";
-import { fetchCategoryClothes, fetchTypeClothes } from "../api/fetchClothes";
+import { fetchAllFinalClothes, fetchClothByCategoryTypes } from "../api/Device/fetchDeviceClothes";
+import { startSSEProcess } from "../api/Device/finalClothSwap";
 
 
 export default function FinalPreviewScreen() {
@@ -37,70 +24,74 @@ export default function FinalPreviewScreen() {
   const location = useLocation();
   const carouselRef = useRef(null);
 
-  const { clothCategory,
-    clothType,
-    swapCloth,
-    capturedImage } = location.state || {};
+  const { typeId, capturedImage, categoryId } = location.state || {};
 
-  console.log("Final Preview Data:", { clothCategory, clothType, swapCloth, capturedImage });
 
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextAction, setNextAction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("Finding your perfect swap...");
   const [finalImage, setFinalImage] = useState('');
-
   const [favorites, setFavorites] = useState(new Set());
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [clothTypes, setClothTypes] = useState([])
-  const [categoryClothes, setCategoryClothes] = useState([])
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [clothes, setClothes] = useState([]);
+  const [categoryClothes, setCategoryClothes] = useState([]); // for filter modal
 
 
-  async function getTypeClothes(category, type) {
 
-    const response = await fetchTypeClothes(category, type);
-    const formatted = response.Items.map((item) => ({
-      id: item.ID,
-      name: item.Name,
-      image: item.Image,
-      description: item.Description
-    }))
-    setClothTypes(formatted)
+  // Convert capturedImage (File or URL) to previewUrl
+  useEffect(() => {
+    if (capturedImage instanceof File) {
+      const url = URL.createObjectURL(capturedImage);
+      setPreviewUrl(url);
+
+      return () => URL.revokeObjectURL(url); // cleanup
+    } else {
+      setPreviewUrl(capturedImage);
+    }
+  }, [capturedImage]);
+
+  // Fetch clothes based on typeId when component mounts
+  async function loadTypeClothes(typeId) {
+    setIsLoading(true);
+    try {
+      const response = await fetchAllFinalClothes(typeId);
+      if (response?.Status && Array.isArray(response.Data)) {
+        console.log("Fetched final clothes:", response.Data);
+        setClothes(response.Data);
+      }
+    } catch (err) {
+      console.error("Error fetching final clothes", err);
+    } finally {
+      setIsLoading(false);
+    }
   }
   useEffect(() => {
-    getTypeClothes(clothCategory, clothType)
-  }, [])
+    loadTypeClothes(typeId);
+  }, [typeId]);
 
-  async function getCategoriesClothes(category) {
-    const response = await fetchCategoryClothes(category);
-   const formatted = response.map((item) => ({
-      id: item.ID,
-      name: item.Name,
-      image: item.Image,
-      description: item.Description
-    }))
-    setCategoryClothes(formatted);
-  }
+
+  // Fetch clothes based on CategoryID when component mounts
   useEffect(() => {
-    getCategoriesClothes(clothCategory)
-  }, [])
+    async function loadClothes() {
+      setIsLoading(true);
+      try {
+        const response = await fetchClothByCategoryTypes(categoryId);
+        if (response?.Status && Array.isArray(response.Data)) {
+          console.log("Fetched  Category clothes:", response.Data);
+          setCategoryClothes(response.Data);
+        }
+      } catch (err) {
+        console.error("Error fetching Category clothes", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadClothes();
+  }, [categoryId]);
 
 
-  // Dummy data for recommendations
-  const recommendations = [
-    { image: Sample1, text: "Vintage Denim" },
-    { image: Sample2, text: "Floral Summer" },
-    { image: Sample3, text: "Cozy Knit" },
-    { image: Sample4, text: "Plain subtle" },
-    { image: Sample1, text: "Casual Amber Shirt" },
-    { image: Sample6, text: "Elegant Snowlight" },
-    { image: Sample1, text: "Vintage Denim" },
-    { image: Sample2, text: "Floral Summer" },
-    { image: Sample3, text: "Cozy Knit" },
-    { image: Sample4, text: "Plain subtle" },
-    { image: Sample2, text: "Casual Amber Shirt" },
-    { image: Sample6, text: "Elegant Snowlight" },
-  ];
 
 
 
@@ -148,57 +139,53 @@ export default function FinalPreviewScreen() {
     if (el) {
       setMaxDrag(el.scrollWidth - el.offsetWidth);
     }
-  }, [recommendations]);
+  }, []);
 
 
-  useEffect(() => {
-    startSSEProcess(
-      capturedImage,
-      clothCategory,
-      clothType,
-      swapCloth,
+  const handleClothClick = async (cloth) => {
+    console.log("Cloth clicked:", cloth);
+    setIsLoading(true);
+    setLoadingMessage("Starting swap...");
+
+    await startSSEProcess(
+      capturedImage, // person
+      cloth.id, // clothId
       (eventType, data) => {
         console.log("SSE event received:", eventType, data);
 
-        // Prefer string message locations
+        // update messages
         if (data?.data && typeof data.data === "string") {
           setLoadingMessage(data.data);
         } else if (data?.data && typeof data.data === "object") {
-          // step events often have data.message
-          const maybeMsg = data.data?.message ?? JSON.stringify(data.data);
-          setLoadingMessage(maybeMsg);
-        } else if (data?.status && typeof data.status === "string") {
-          setLoadingMessage(data.data ?? data.status);
+          setLoadingMessage(data.data?.message ?? JSON.stringify(data.data));
+        } else if (data?.status) {
+          setLoadingMessage(data.status);
         }
 
-        // completed -> set final image (backend includes fileUrl in completed.data.data[0].fileUrl)
+        // completed -> update finalImage
         if (eventType === "completed") {
           const url = data?.data?.data?.[0]?.fileUrl;
           if (url) {
             setFinalImage(url);
-            console.log("final image URL set:", url);
-          } else {
-            console.log("completed received but no fileUrl:", data);
+            console.log("Final swapped image:", url);
           }
         }
 
         // done -> stop loader
         if (eventType === "done") {
-          console.log("SSE done received - stopping loader");
           setIsLoading(false);
         }
       },
       (err) => {
         console.error("SSE error:", err);
-        setLoadingMessage("Something went wrong. Please try again.");
+        setLoadingMessage("Swap failed. Please try again.");
         setIsLoading(false);
       },
       (parsedDone) => {
-        // optional final callback when 'done' is processed by helper
-        console.log("onComplete (done) callback:", parsedDone);
+        console.log("SSE onComplete:", parsedDone);
       }
     );
-  }, []);
+  };
 
 
 
@@ -255,15 +242,15 @@ export default function FinalPreviewScreen() {
                 transition={{ delay: 0.2 }}
                 className="relative bg-white lg:w-1/3 lg:mx-auto flex flex-col items-center justify-center rounded-3xl shadow-xl border border-[#d4b896]/20 overflow-hidden mb-8"
               >
-                {finalImage ? (
-                  <img
-                    src={finalImage}
-                    alt="Final Style"
-                    className="w-full h-[60vh] sm:h-[70vh] object-contain"
-                  />
-                ) : (
+                {/* {finalImage ? ( */}
+                <img
+                  src={finalImage || previewUrl}
+                  alt="Final Style"
+                  className="w-full h-[60vh] sm:h-[70vh] object-contain"
+                />
+                {/* ) : (
                   <p className="p-4 text-center text-gray-500">No final image received</p>
-                )}
+                )} */}
 
                 {/* Action Buttons */}
                 <div className="absolute top-4 right-4 flex flex-col gap-3">
@@ -299,7 +286,15 @@ export default function FinalPreviewScreen() {
                 </motion.div>
               </motion.div>
 
-              <CarouselComponent items={clothTypes} />
+              <CarouselComponent
+                items={clothes.map((c) => ({
+                  id: c.Cloth_ID,           // important
+                  name: c.Cloth_Title,   // or c.Name if API returns that
+                  image: c.Image_URL,
+                }))}
+                onItemClick={handleClothClick}
+              />
+
             </div>
           </div>
 
@@ -337,10 +332,17 @@ export default function FinalPreviewScreen() {
                       Try different styles and see how they look on you!
                     </p>
                     <MasonryGrid
-                      items={categoryClothes}
-                      onItemClick={(filter) => {
+                      items={categoryClothes.map((c) => ({
+                        id: c.Type_ID,
+                        name: c.Type_Title,
+                        image: c.Image_URL,
+                      }))}
+                      onItemClick={(item) => {
+                        // console.log("Filter cloth clicked:", item);
+                        loadTypeClothes(item.id);
                         setIsFilterModalOpen(false);
                       }}
+
                       className="pb-6"
                     />
                   </div>
