@@ -49,6 +49,19 @@ export default function ShopRecord({
         localStorage.setItem("shopId", shopId);
         navigate('/client/dashboard');
       };
+      const redirectToUserFlow = () => {
+        const shopId = params.data.Shop_ID;
+        if (!shopId) {
+          toast.error("Shop ID not found");
+          return;
+        }
+
+        localStorage.setItem("shopId", shopId);
+
+        // Open in new tab
+        window.open('http://localhost:5174/#/startup', '_blank');
+      };
+
 
       return (
         <div className="flex items-center gap-2 h-full">
@@ -86,7 +99,16 @@ export default function ShopRecord({
             whileTap={{ scale: 0.9 }}
             onClick={redirectToAdmin}
             className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
-            title="Redirect Shop"
+            title="Redirect Shop Dashboard"
+          >
+            <SquareArrowOutUpRight className="h-4 w-4" />
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={redirectToUserFlow}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors"
+            title="Redirect UserFlow"
           >
             <SquareArrowOutUpRight className="h-4 w-4" />
           </motion.button>
@@ -145,16 +167,16 @@ export default function ShopRecord({
           return "";
         },
       },
-      {
-        field: "Updated_AT",
-        headerName: "Updated At",
-        valueFormatter: (params) => {
-          if (params.value) {
-            return new Date(params.value).toLocaleDateString();
-          }
-          return "";
-        },
-      },
+      // {
+      //   field: "Updated_AT",
+      //   headerName: "Updated At",
+      //   valueFormatter: (params) => {
+      //     if (params.value) {
+      //       return new Date(params.value).toLocaleDateString();
+      //     }
+      //     return "";
+      //   },
+      // },
       {
         field: "actions",
         headerName: "Actions",

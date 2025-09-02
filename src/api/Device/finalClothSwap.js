@@ -36,6 +36,8 @@ export async function startSSEProcess(
     formData.append("person", person);
   
     formData.append("Cloth_ID", clothId);
+    console.log("clothId",clothId)
+    console.log("person",person)
 
     const resp = await fetch(`${BASE_URL}/device/sse_process.php`,
        {
@@ -44,7 +46,7 @@ export async function startSSEProcess(
       headers: getAuthHeaders(),
       // credentials: 'include' // uncomment if needed
     });
-
+    console.log("Response Final Cloth Swap ",resp)
     if (!resp.ok) {
       const t = await resp.text();
       throw new Error(`Server returned ${resp.status}: ${t}`);

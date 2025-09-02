@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom'
 import ShopManage from './Shop/ShopManage'
 import UserManage from './User/UserManager'
 import VisualsManage from './Stats/VisualsManage'
+import Logo from '../../../assets/img/logo.png'
 
 
 
@@ -161,13 +162,9 @@ export default function Dashboard() {
                                 <div className="flex h-full flex-col bg-[#2d1810] shadow-xl">
                                     {/* Close button */}
                                     <div className="flex items-center justify-between p-4">
-                                        <div className="mt-6 text-center">
-                                            <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
-                                                Cloth{" "}
-                                                <span className="bg-[#f84525] text-white px-2 rounded-md">
-                                                    Swap
-                                                </span>
-                                            </h2>
+                                        {/* Logo / Heading */}
+                                        <div className="flex items-center justify-center">
+                                            <img src={Logo} alt="" className='h-32 w-32 ' />
                                         </div>
                                         <motion.button
                                             whileHover={{ scale: 1.1 }}
@@ -238,14 +235,10 @@ export default function Dashboard() {
                         <div className="flex h-16 shrink-0 items-center justify-between">
                             <AnimatePresence mode="wait">
                                 {!desktopSidebarCollapsed && (
-                                      <div className="mt-6 text-center">
-                                            <h2 className="font-bold text-2xl text-[#f7f2e5] bungee-regular">
-                                                Cloth{" "}
-                                                <span className="bg-[#f84525] text-white px-2 rounded-md">
-                                                    Swap
-                                                </span>
-                                            </h2>
-                                        </div>
+
+                                    <div className="flex mt-14   items-center justify-center">
+                                        <img src={Logo} alt="" className='h-32 w-32 ' />
+                                    </div>
                                 )}
                             </AnimatePresence>
 
@@ -267,8 +260,8 @@ export default function Dashboard() {
                         </div>
 
                         {/* Navigation */}
-                        <nav className="flex flex-1 flex-col">
-                            <ul className="flex flex-1 flex-col gap-y-7">
+                        <nav className="flex flex-1 flex-col mt-14">
+                            <ul className="flex flex-1 flex-col gap-y-10">
                                 <li>
                                     <ul className={classNames(
                                         "space-y-1",
@@ -359,7 +352,7 @@ export default function Dashboard() {
                     <a href="/sa/login" className="rounded-full">
                         <img
                             alt="Profile"
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                            src={Logo}
                             className="h-8 w-8 rounded-full"
                         />
                     </a>

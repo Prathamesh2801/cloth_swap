@@ -14,7 +14,6 @@ function getShopIdAndUserRole() {
   const shopId = localStorage.getItem("shopId");
   const role = localStorage.getItem("role");
 
-
   if (!role) {
     throw new Error("User role not found in localStorage");
   }
@@ -35,7 +34,7 @@ export async function getFinalClothes(typeId = null, clothId = null) {
     params.Type_ID = typeId;
     params.Cloth_ID = clothId;
 
-    const response = await axios.get(`${BASE_URL}/Admin/cloths.php`, {
+    const response = await axios.get(`${BASE_URL}/admin/cloths.php`, {
       headers: getAuthHeaders(),
       params,
     });
@@ -43,6 +42,10 @@ export async function getFinalClothes(typeId = null, clothId = null) {
     return response.data;
   } catch (error) {
     console.error("Error fetching final Clothes :", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -67,7 +70,7 @@ export async function createFinalClothes(clothData) {
     }
 
     const response = await axios.post(
-      `${BASE_URL}/Admin/cloths.php`,
+      `${BASE_URL}/admin/cloths.php`,
       formData,
       {
         headers: {
@@ -80,6 +83,10 @@ export async function createFinalClothes(clothData) {
     return response.data;
   } catch (error) {
     console.error("Error creating Final Clothes :", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -104,7 +111,7 @@ export async function deleteFinalClothes(clothId) {
       params.Shop_ID = shopId;
     }
 
-    const response = await axios.delete(`${BASE_URL}/Admin/cloths.php`, {
+    const response = await axios.delete(`${BASE_URL}/admin/cloths.php`, {
       headers: getAuthHeaders(),
       params,
     });
@@ -112,6 +119,10 @@ export async function deleteFinalClothes(clothId) {
     return response.data;
   } catch (error) {
     console.error("Error deleting Final Clothes :", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }

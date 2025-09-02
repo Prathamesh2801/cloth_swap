@@ -16,6 +16,7 @@ const UserManage = () => {
         Shop_ID: ''
     });
 
+
     // Fetch users on component mount
     useEffect(() => {
         fetchUsers();
@@ -42,6 +43,7 @@ const UserManage = () => {
     };
 
     const handleCreateUser = async (userData) => {
+        console.log("User Data",userData)
         const promise = createUser(userData);
 
         toast.promise(promise, {
@@ -148,7 +150,7 @@ const UserManage = () => {
                                     {currentView === 'records' ? 'Manage user accounts' : editingUser ? 'Edit user details' : 'Create new user'}
                                 </p>
                             </div>
-                            
+
                         </div>
 
                         {currentView === 'records' && (
@@ -170,7 +172,7 @@ const UserManage = () => {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                             
+
                                 <span className="hidden sm:inline">Display Records</span>
                                 <span className="sm:hidden">Records</span>
                             </motion.button>

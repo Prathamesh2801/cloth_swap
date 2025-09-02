@@ -7,6 +7,7 @@ import femaleIcon from "../assets/img/Startup/femaleIcon.png";
 import LoadingScreen from "./LoadingScreen";
 import PageTransitionLoader from "./PageTransitionLoader";
 import { useMediaQuery } from "react-responsive";
+import Logo from '../assets/img/logo1.png'
 export default function Startup() {
   const [selectedGender, setSelectedGender] = useState(null);
   const [isPressed, setIsPressed] = useState({ Male: false, Female: false });
@@ -93,12 +94,16 @@ export default function Startup() {
 
           {/* Main Content */}
           <div className="relative z-10 w-full max-w-md mx-auto text-center">
+            <div className="d-flex items-center justify-center">
+              <img src={Logo} alt="" className="h-36 w-36 mx-auto"/>
+            </div>
+
             {/* Title */}
             <div className="mb-16 animate-fade-in">
-              <h1 className="text-4xl md:text-5xl font-bold text-amber-900 mb-4 tracking-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-amber-900 mb-4 tracking-tight">
                 Choose Your
               </h1>
-              <h2 className="text-3xl md:text-4xl font-light text-amber-800 italic">
+              <h2 className="text-2xl md:text-3xl font-normal text-amber-800 italic">
                 Gender
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-amber-600 to-amber-800 mx-auto mt-6 rounded-full"></div>
@@ -160,12 +165,6 @@ export default function Startup() {
             </div>
           </div>
 
-          {/* Bottom Text */}
-          <div className="absolute bottom-8 left-0 right-0 text-center">
-            <p className="text-amber-700 text-sm opacity-70">
-              Select your gender to personalize your cloth swap experience
-            </p>
-          </div>
 
           <style>{`
         @keyframes fade-in {

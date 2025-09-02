@@ -5,26 +5,43 @@ import PageTransitionLoader from "./PageTransitionLoader";
 import PageHeader from "./utils/PageHeader";
 import MasonryGrid from "./utils/MasonryGrid";
 import bannerD from "../assets/img/SelectCloth/bannerD.png";
-import { fetchTypeClothes } from "../api/fetchClothes";
+
 import { fetchClothByCategoryTypes } from "../api/Device/fetchDeviceClothes";
+import FallbackScreen from "./ui/FallbackScreen";
+import { ShirtIcon } from "lucide-react";
+
 
 export default function SelectClothTypeScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const categoryId = location.state
   const [isTransitioning, setIsTransitioning] = useState(false);
-  // { type: "forward", path, state } or { type: "back" }
-  const [nextAction, setNextAction] = useState(null);
+  const [nextAction, setNextAction] = useState(null); // { type: "forward", path, state } or { type: "back" }
   const [clothTypes, setClothTypes] = useState([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+
   async function getTypeClothes(categoryID) {
-    const response = await fetchClothByCategoryTypes(categoryID);
-    const formatted = response.Data.map((item) => ({
-      id: item.Type_ID,
-      name: item.Type_Title,
-      image: item.Image_URL,
-      description: item.Type_Description
-    }))
-    setClothTypes(formatted)
+    try {
+      setIsLoading(true);
+      setHasError(false);
+      const response = await fetchClothByCategoryTypes(categoryID);
+      const formatted = response.Data.map((item) => ({
+        id: item.Type_ID,
+        name: item.Type_Title,
+        image: item.Image_URL,
+        description: item.Type_Description
+      }))
+      setClothTypes(formatted)
+    } catch (error) {
+      console.error("Error fetching clothes:", error);
+      setHasError(true);
+
+    } finally {
+      setIsLoading(false);
+    }
+
   }
   useEffect(() => {
     getTypeClothes(categoryId)
@@ -35,7 +52,7 @@ export default function SelectClothTypeScreen() {
     setNextAction({
       type: "forward",
       path: `/camera`,
-      state: {categoryId , typeId: item.id },
+      state: { categoryId, typeId: item.id },
     });
     setIsTransitioning(true);
   };
@@ -44,6 +61,62 @@ export default function SelectClothTypeScreen() {
   const handleBack = () => {
     setNextAction({ type: "back" });
     setIsTransitioning(true);
+  };
+
+
+
+  const handleRetry = () => {
+    getTypeClothes(categoryId)
+
+  };
+
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <FallbackScreen
+          title="Loading..."
+          subtitle="We're fetching your clothing options"
+          icon={ShirtIcon}
+          showAction={false}
+          theme="amber"
+        />
+      );
+    }
+
+    if (hasError) {
+      return (
+        <FallbackScreen
+          title="Something went wrong"
+          subtitle="We couldn't load the clothing categories. Please try again."
+          icon={ShirtIcon}
+          actionText="Retry"
+          onAction={handleRetry}
+          theme="amber"
+        />
+      );
+    }
+
+    if (clothTypes.length === 0) {
+      return (
+        <FallbackScreen
+          title="No Clothes Available"
+          subtitle="We don't have any clothing items for this category at the moment."
+          icon={ShirtIcon}
+          actionText="Refresh"
+          onAction={handleRetry}
+          theme="amber"
+        />
+      );
+    }
+
+    return (
+      <MasonryGrid
+        items={clothTypes}
+        onItemClick={handleItemClick}
+        className="pb-8"
+      />
+    );
   };
 
   return (
@@ -83,11 +156,7 @@ export default function SelectClothTypeScreen() {
             className="mx-4"
           />
 
-          <MasonryGrid
-            items={clothTypes}
-            onItemClick={handleItemClick}
-            className="pb-8"
-          />
+          {renderContent()}
         </div>
       </motion.div>
     </>

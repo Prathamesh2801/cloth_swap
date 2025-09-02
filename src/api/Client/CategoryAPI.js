@@ -32,7 +32,7 @@ export async function getCategories() {
       params.Shop_ID = getShopIdAndUserRole().shopId;
     }
 
-    const response = await axios.get(`${BASE_URL}/Admin/category.php`, {
+    const response = await axios.get(`${BASE_URL}/admin/category.php`, {
       headers: getAuthHeaders(),
       params,
     });
@@ -40,6 +40,10 @@ export async function getCategories() {
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
+     if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -67,7 +71,7 @@ export async function createCategory(categoryData) {
     }
 
     const response = await axios.post(
-      `${BASE_URL}/Admin/category.php`,
+      `${BASE_URL}/admin/category.php`,
       formData,
       {
         headers: {
@@ -80,6 +84,10 @@ export async function createCategory(categoryData) {
     return response.data;
   } catch (error) {
     console.error("Error creating category:", error);
+  if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -111,7 +119,7 @@ export async function updateCategory(updateData) {
     }
 
     const response = await axios.put(
-      `${BASE_URL}/Admin/category.php`,
+      `${BASE_URL}/admin/category.php`,
       formData,
       {
         headers: {
@@ -123,6 +131,10 @@ export async function updateCategory(updateData) {
     return response.data;
   } catch (error) {
     console.error("Error updating category:", error);
+   if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -147,7 +159,7 @@ export async function deleteCategory(categoryId) {
       params.Shop_ID = shopId; // only add Shop_ID if Super_Admin
     }
 
-    const response = await axios.delete(`${BASE_URL}/Admin/category.php`, {
+    const response = await axios.delete(`${BASE_URL}/admin/category.php`, {
       headers: getAuthHeaders(),
       params,
     });
@@ -155,6 +167,10 @@ export async function deleteCategory(categoryId) {
     return response.data;
   } catch (error) {
     console.error("Error deleting category:", error);
+     if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }

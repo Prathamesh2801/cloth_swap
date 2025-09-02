@@ -20,6 +20,8 @@ const getHeaders = (contentType = "application/json") => {
     headers["Content-Type"] = contentType;
   }
 
+  console.log(headers);
+
   return headers;
 };
 
@@ -34,16 +36,17 @@ export const fetchShops = async (filters = {}) => {
         State: filters.State,
       },
     });
-    
-    return response.data;
 
+    return response.data;
   } catch (error) {
     console.error("Error fetching shops:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
-
-
 
 // POST - Add new shop
 export const addShop = async (shopData) => {
@@ -56,6 +59,9 @@ export const addShop = async (shopData) => {
       }
     });
 
+    console.log("Shop data",shopData)
+    console.log("Shop Form Data",formData)
+
     const response = await axios.post(SHOP_URL, formData, {
       headers: {
         Authorization: `Bearer ${getAuthToken()}`,
@@ -66,6 +72,10 @@ export const addShop = async (shopData) => {
     return response.data;
   } catch (error) {
     console.error("Error adding shop:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
@@ -80,6 +90,10 @@ export const updateShop = async (shopData) => {
     return response.data;
   } catch (error) {
     console.error("Error updating shop:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
@@ -95,6 +109,10 @@ export const deleteShop = async (shopId) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting shop:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };

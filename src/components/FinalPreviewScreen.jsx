@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   XMarkIcon,
   ShareIcon,
-  ShoppingBagIcon,
+  ArrowDownCircleIcon,
 } from "@heroicons/react/24/outline";
 
 import PageHeader from "./utils/PageHeader";
@@ -23,16 +23,12 @@ export default function FinalPreviewScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const carouselRef = useRef(null);
-
   const { typeId, capturedImage, categoryId } = location.state || {};
-
-
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextAction, setNextAction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("Finding your perfect swap...");
   const [finalImage, setFinalImage] = useState('');
-  const [favorites, setFavorites] = useState(new Set());
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [clothes, setClothes] = useState([]);
@@ -57,6 +53,7 @@ export default function FinalPreviewScreen() {
     setIsLoading(true);
     try {
       const response = await fetchAllFinalClothes(typeId);
+      console.log("Final Clothes ", response.Data)
       if (response?.Status && Array.isArray(response.Data)) {
         console.log("Fetched final clothes:", response.Data);
         setClothes(response.Data);
@@ -92,42 +89,54 @@ export default function FinalPreviewScreen() {
   }, [categoryId]);
 
 
-
-
-
-
   const handleBack = () => {
     setNextAction({ type: "back" });
     setIsTransitioning(true);
   };
 
-  const handleSlideChange = (direction) => {
-    if (direction === "next") {
-      if (currentSlide < recommendations.length - 1) {
-        setCurrentSlide(currentSlide + 1);
+
+
+
+  const handleDownload = () => {
+    const link = document.createElement('a')
+    link.href = finalImage || previewUrl
+    link.download = "swapped-image.png";
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleShare = async () => {
+    try {
+      if (navigator.canShare && previewUrl?.startsWith("blob:")) {
+        // Convert blob URL to file for sharing
+        const blob = await fetch(previewUrl).then(r => r.blob());
+        const file = new File([blob], "swapped-image.png", { type: blob.type });
+
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "Shared Image",
+            files: [file],
+          });
+          return;
+        }
       }
-    } else {
-      if (currentSlide > 0) {
-        setCurrentSlide(currentSlide - 1);
+
+      // Fallback: share via URL
+      if (navigator.share) {
+        await navigator.share({
+          title: "Shared Image",
+          url: finalImage || previewUrl,
+        });
+      } else {
+        navigator.clipboard.writeText(finalImage || previewUrl);
+        alert("Image URL copied to clipboard!");
       }
+    } catch (err) {
+      console.log("Share cancelled", err);
     }
   };
-  const toggleFavorite = (id) => {
-    setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(id)) {
-        newFavorites.delete(id);
-      } else {
-        newFavorites.add(id);
-      }
-      return newFavorites;
-    });
-  };
 
-  const handleFilterClick = (filter) => {
-    setSelectedFilter(filter);
-    setIsFilterModalOpen(true);
-  };
 
   const handleSwipeUp = () => {
     setIsFilterModalOpen(true);
@@ -242,31 +251,41 @@ export default function FinalPreviewScreen() {
                 transition={{ delay: 0.2 }}
                 className="relative bg-white lg:w-1/3 lg:mx-auto flex flex-col items-center justify-center rounded-3xl shadow-xl border border-[#d4b896]/20 overflow-hidden mb-8"
               >
-                {/* {finalImage ? ( */}
-                <img
-                  src={finalImage || previewUrl}
-                  alt="Final Style"
-                  className="w-full h-[60vh] sm:h-[70vh] object-contain"
-                />
-                {/* ) : (
-                  <p className="p-4 text-center text-gray-500">No final image received</p>
-                )} */}
+
+                <div className="w-full h-[60vh] sm:h-[70vh] flex items-center justify-center bg-gray-100">
+                  {finalImage || previewUrl ? (
+                    <img
+                      src={finalImage || previewUrl}
+                      alt="Final Style"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  ) : (
+                    <p className="text-gray-500 font-medium text-center px-4">
+                      No image available. Please capture or swap an image to preview.
+                    </p>
+                  )}
+                </div>
+
 
                 {/* Action Buttons */}
                 <div className="absolute top-4 right-4 flex flex-col gap-3">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={handleShare}
+                    title="Share Image"
                     className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
                   >
                     <ShareIcon className="w-5 h-5 text-[#8b4513]" />
                   </motion.button>
                   <motion.button
+                    onClick={handleDownload}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    title="Download Image"
                     className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
                   >
-                    <ShoppingBagIcon className="w-5 h-5 text-[#8b4513]" />
+                    <ArrowDownCircleIcon className="w-5 h-5 text-[#8b4513]" />
                   </motion.button>
                 </div>
 
@@ -288,9 +307,11 @@ export default function FinalPreviewScreen() {
 
               <CarouselComponent
                 items={clothes.map((c) => ({
-                  id: c.Cloth_ID,           // important
-                  name: c.Cloth_Title,   // or c.Name if API returns that
+                  id: c.Cloth_ID,          
+                  name: c.Cloth_Title,  
                   image: c.Image_URL,
+                  size: c.Cloth_Size,
+                  swap_type: c.Cloth_Swap_Type
                 }))}
                 onItemClick={handleClothClick}
               />

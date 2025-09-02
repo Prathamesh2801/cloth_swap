@@ -1,12 +1,27 @@
 import axios from "axios";
 import { BASE_URL } from "../../../config";
 
-// ✅ Helper to get auth headers
-const getHeaders = () => {
-  const token = localStorage.getItem("token"); // make sure you store token in localStorage after login
-  return {
+const USER_URL = BASE_URL + "/superAdmin/user.php";
+
+// 🔹 Get Bearer token
+const getAuthToken = () => {
+  const token = localStorage.getItem("token");
+  return token;
+};
+
+// 🔹 Common headers
+const getHeaders = (contentType = "application/json") => {
+  const token = getAuthToken();
+  const headers = {
     Authorization: `Bearer ${token}`,
   };
+
+  if (contentType) {
+    headers["Content-Type"] = contentType;
+  }
+
+  console.log("Headers:", headers);
+  return headers;
 };
 
 /**
@@ -15,37 +30,53 @@ const getHeaders = () => {
  */
 export const getUsers = async (filters = {}) => {
   try {
-    const response = await axios.get(`${BASE_URL}/superAdmin/user.php`, {
+    const response = await axios.get(USER_URL, {
       headers: getHeaders(),
       params: filters,
     });
+
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
 
 /**
  * 🔹 CREATE User
- * @param {Object} userData { Username, Password, Role, Shop_ID (if Admin/Device) }
+ * @param {Object} userData { Username, Password, Role, Shop_ID? }
  */
 export const createUser = async (userData) => {
   try {
     const formData = new FormData();
-    Object.entries(userData).forEach(([key, value]) => {
-      formData.append(key, value);
+
+    Object.keys(userData).forEach((key) => {
+      if (userData[key] !== null && userData[key] !== undefined) {
+        formData.append(key, userData[key]);
+      }
     });
 
-    const response = await axios.post(
-      `${BASE_URL}/superAdmin/user.php`,
-      formData,
-      { headers: getHeaders() }
-    );
+    console.log("User data", userData);
+    console.log("User Form Data", formData);
+
+    const response = await axios.post(USER_URL, formData, {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+        // ❌ No Content-Type → axios will set multipart/form-data automatically
+      },
+    });
 
     return response.data;
   } catch (error) {
     console.error("Error creating user:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
@@ -56,15 +87,17 @@ export const createUser = async (userData) => {
  */
 export const updateUser = async (updateData) => {
   try {
-    const response = await axios.put(
-      `${BASE_URL}/superAdmin/user.php`,
-      updateData,
-      { headers: { ...getHeaders(), "Content-Type": "application/json" } }
-    );
+    const response = await axios.put(USER_URL, updateData, {
+      headers: getHeaders("application/json"),
+    });
 
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
@@ -75,13 +108,18 @@ export const updateUser = async (updateData) => {
  */
 export const deleteUser = async (username) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/superAdmin/user.php`, {
+    const response = await axios.delete(USER_URL, {
       headers: getHeaders(),
       params: { Username: username },
     });
+
     return response.data;
   } catch (error) {
     console.error("Error deleting user:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };
@@ -89,12 +127,16 @@ export const deleteUser = async (username) => {
 // For Fuzzy Search
 export const getShops = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/superAdmin/user.php`, {
+    const response = await axios.get(USER_URL, {
       headers: getHeaders(),
     });
     return response.data;
   } catch (error) {
     console.error("Error fetching shops:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 };

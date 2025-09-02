@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../../api/SuperAdmin/Auth'
+import Logo1 from '../../assets/img/logo1.png'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -17,11 +18,11 @@ export default function Login() {
       if (role === "Super_Admin") {
         navigate("/sa/dashboard", { replace: true });
       }
-      
+
       else if (role === "Admin") {
         navigate("/client/dashboard", { replace: true });
       }
-      else{
+      else {
         navigate("/startup", { replace: true });
       }
     }
@@ -56,18 +57,14 @@ export default function Login() {
       <div className="w-full max-w-sm sm:max-w-md px-6 py-6 roboto-regular tracking-wider bg-[#e8dabe] shadow-md rounded-lg overflow-y-auto max-h-[95vh]">
         <form onSubmit={handleSubmit}>
           {/* Logo / Heading */}
-          <div className="mb-6 text-center">
-            <h2 className="font-bold text-3xl bungee-regular">
-              Cloth{" "}
-              <span className="bg-[#f84525] text-white px-2 rounded-md">
-                Swap
-              </span>
-            </h2>
+          <div className="flex items-center justify-center">
+            <img src={Logo1} alt="" className='h-32 w-32 ' />
           </div>
+
 
           {/* Login Title */}
           <div className="py-4 text-center">
-            <span className="text-2xl  bebas-neue-regular tracking-wider " style={{ wordSpacing: 5, fontWeight: 600 }}> Admin Login</span>
+            <span className="text-2xl  bebas-neue-regular tracking-wider underline " style={{ wordSpacing: 5, fontWeight: 500 }}> Admin Login</span>
           </div>
 
           {/* Username */}

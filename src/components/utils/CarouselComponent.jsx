@@ -11,7 +11,6 @@ export default function Carousel({ items, onItemClick }) {
   console.log("Carousel items:", items);
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [favorites, setFavorites] = useState(new Set());
   const [currentSlide, setCurrentSlide] = useState(0);
   const [maxSlideIndex, setMaxSlideIndex] = useState(0);
 
@@ -33,15 +32,7 @@ export default function Carousel({ items, onItemClick }) {
     });
   };
 
-  const toggleFavorite = (id) => {
-    setFavorites((prev) => {
-      const updated = new Set(prev);
-      if (updated.has(id)) updated.delete(id);
-      else updated.add(id);
-      return updated;
-    });
-  };
-
+  
   // Prevent arrow button events from triggering drag or page scroll
   const stopEvent = (e) => {
     e.stopPropagation();
@@ -91,24 +82,29 @@ export default function Carousel({ items, onItemClick }) {
               <div className="relative">
                 <img
                   src={BASE_URL + '/' + item.image}
-                  alt={BASE_URL + '/' + item.image}
+                  alt={item.name}
                   className="w-full h-48 object-contain"
                 />
-                <motion.button
-                  type="button"
-                  onMouseDown={stopEvent}
-                  onTouchStart={stopEvent}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleFavorite(item.id)}
-                  className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
-                >
-                  {favorites.has(item.id) ? (
-                    <HeartSolidIcon className="w-4 h-4 text-red-500" />
-                  ) : (
-                    <HeartIcon className="w-4 h-4 text-[#8b4513]" />
-                  )}
-                </motion.button>
+                
+                {/* Swap Type Badge - Left Side */}
+                {item.swap_type && (
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-block px-3 py-1 bg-[#2d1810]/90 text-[#f3ecd2] text-xs font-semibold rounded-full shadow-lg backdrop-blur-sm">
+                      {item.swap_type}
+                    </span>
+                  </div>
+                )}
+
+                {/* Size Badge - Right Side */}
+                {item.size && (
+                  <div className="absolute top-3 right-3">
+                    <span className="inline-block px-3 py-1 bg-[#8b4513]/90 text-white text-xs font-semibold rounded-full shadow-lg backdrop-blur-sm">
+                      {item.size}
+                    </span>
+                  </div>
+                )}
+
+               
               </div>
               <div className="p-4">
                 <h4 className="font-semibold bungee-regular text-center text-[#2d1810] text-sm mb-1">
@@ -126,8 +122,6 @@ export default function Carousel({ items, onItemClick }) {
           onTouchStart={stopEvent}
           onClick={() => handleSlideChange("prev")}
           disabled={currentSlide === 0}
-          // whileHover={{ scale: 1.1 }}
-          // whileTap={{ scale: 0.9 }}
           className={`absolute top-1/2 left-2 transform -translate-y-1/2 p-2 bg-[#8b4513] backdrop-blur-sm rounded-full shadow-lg z-10 transition-all ${currentSlide === 0 ? "opacity-50 cursor-not-allowed" : ""
             }`}
         >
@@ -141,8 +135,6 @@ export default function Carousel({ items, onItemClick }) {
           onTouchStart={stopEvent}
           onClick={() => handleSlideChange("next")}
           disabled={currentSlide === maxSlideIndex}
-          // whileHover={{ scale: 1.1 }}
-          // whileTap={{ scale: 0.9 }}
           className={`absolute top-1/2 right-2 transform -translate-y-1/2 p-2 bg-[#8b4513] backdrop-blur-sm rounded-full shadow-lg z-10 transition-all ${currentSlide === maxSlideIndex ? "opacity-50 cursor-not-allowed" : ""
             }`}
         >

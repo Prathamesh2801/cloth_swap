@@ -8,7 +8,7 @@ import Login from "./components/SuperAdmin/Login";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./components/SuperAdmin/Dashboard/Dashboard";
 import ProtectedSARoutes from "./routes/ProtectedSARoutes";
-import ClientDashboard from "./components/Admin/Dashboard/ClientDashboard";
+import ClientDashboard from "./components/admin/Dashboard/ClientDashboard";
 import ProtectedClientRoutes from "./routes/ProtectedClientRoutes";
 
 

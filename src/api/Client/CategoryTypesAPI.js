@@ -14,7 +14,6 @@ function getShopIdAndUserRole() {
   const shopId = localStorage.getItem("shopId");
   const role = localStorage.getItem("role");
 
-
   if (!role) {
     throw new Error("User role not found in localStorage");
   }
@@ -39,7 +38,7 @@ export async function getCategoriesTypes(typeId = null, categoryId = null) {
       params.Category_ID = categoryId;
     }
 
-    const response = await axios.get(`${BASE_URL}/Admin/type.php`, {
+    const response = await axios.get(`${BASE_URL}/admin/type.php`, {
       headers: getAuthHeaders(),
       params,
     });
@@ -48,6 +47,10 @@ export async function getCategoriesTypes(typeId = null, categoryId = null) {
     return response.data;
   } catch (error) {
     console.error("Error fetching categories Types :", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -70,7 +73,7 @@ export async function createCategoryTypes(typeData) {
       formData.append("image", typeData.image);
     }
 
-    const response = await axios.post(`${BASE_URL}/Admin/type.php`, formData, {
+    const response = await axios.post(`${BASE_URL}/admin/type.php`, formData, {
       headers: {
         ...getAuthHeaders(),
         "Content-Type": "multipart/form-data",
@@ -80,6 +83,10 @@ export async function createCategoryTypes(typeData) {
     return response.data;
   } catch (error) {
     console.error("Error creating category Types :", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -109,7 +116,7 @@ export async function updateCategoryTypes(updateData) {
       formData.append("Shop_ID", getShopIdAndUserRole().shopId);
     }
 
-    const response = await axios.put(`${BASE_URL}/Admin/type.php`, formData, {
+    const response = await axios.put(`${BASE_URL}/admin/type.php`, formData, {
       headers: {
         ...getAuthHeaders(),
         "Content-Type": "multipart/form-data",
@@ -119,6 +126,10 @@ export async function updateCategoryTypes(updateData) {
     return response.data;
   } catch (error) {
     console.error("Error updating category Types :", error);
+     if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
@@ -143,7 +154,7 @@ export async function deleteCategoryTypes(typeId) {
       params.Shop_ID = shopId;
     }
 
-    const response = await axios.delete(`${BASE_URL}/Admin/type.php`, {
+    const response = await axios.delete(`${BASE_URL}/admin/type.php`, {
       headers: getAuthHeaders(),
       params,
     });
@@ -151,6 +162,10 @@ export async function deleteCategoryTypes(typeId) {
     return response.data;
   } catch (error) {
     console.error("Error deleting category:", error);
+    if (error?.response?.status === 401) {
+      localStorage.clear();
+      window.location.href = "/#/login";
+    }
     throw error;
   }
 }
