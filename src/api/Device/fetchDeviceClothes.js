@@ -73,12 +73,19 @@ export async function fetchClothByCategoryTypes(categoryID) {
   }
 }
 
-export async function fetchAllFinalClothes(typeID) {
+export async function fetchAllFinalClothes(typeID, clothSize = null) {
   try {
     const { shopId, role } = getShopIdAndUserRole();
 
+    // always include typeId
     const params = { Type_ID: typeID };
 
+    // add cloth size if selected
+    if (clothSize) {
+      params.Cloth_Size = clothSize;
+    }
+
+    // add shopId if Super_Admin
     if (role === "Super_Admin" && shopId) {
       params.Shop_ID = shopId;
     }

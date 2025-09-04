@@ -1,12 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import  { useEffect, useRef, useState } from "react";
+
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { clothingTips } from "../helper/dummyTips";
 
+
+
 export default function LoadingScreen({
   isLoading = true,
   message = "Finding your perfect swap...",
-  onLoadingComplete = () => { },
   backgroundColor = "#F3ECD2",
   primaryColor = "#D97706",
   secondaryColor = "#92400E",
@@ -240,7 +242,7 @@ export default function LoadingScreen({
               </p>
             </motion.div>
 
-           
+
 
             {/* Progress Bar */}
             <motion.div

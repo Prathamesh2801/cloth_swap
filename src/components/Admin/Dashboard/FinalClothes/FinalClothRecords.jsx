@@ -121,7 +121,15 @@ const FinalClothRecords = ({
             field: 'Cloth_Size',
             sortable: true,
             filter: true,
-            width: 150,
+            width: 100,
+            cellClass: "flex items-center justify-center font-medium",
+        },
+        {
+            headerName: 'Cloths Swap Type',
+            field: 'Cloth_Swap_Type',
+            sortable: true,
+            filter: true,
+            width: 100,
             cellClass: "flex items-center justify-center font-medium",
         },
         {

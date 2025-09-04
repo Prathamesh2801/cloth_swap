@@ -8,6 +8,7 @@ import { deleteShop } from "../../../../api/SuperAdmin/ShopAPI";
 import ShopViewModal from "./ShopViewModal";
 import ConfirmModal from "../../../ui/ConfirmModal";
 import { useNavigate } from "react-router-dom";
+import { redirectToUserFlowURL } from "../../../../../config";
 
 export default function ShopRecord({
   shops,
@@ -59,7 +60,7 @@ export default function ShopRecord({
         localStorage.setItem("shopId", shopId);
 
         // Open in new tab
-        window.open('http://localhost:5174/#/startup', '_blank');
+        window.open(redirectToUserFlowURL, '_blank');
       };
 
 

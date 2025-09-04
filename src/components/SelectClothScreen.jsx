@@ -53,7 +53,7 @@ export default function SelectClothScreen() {
     setNextAction({
       type: "forward",
       path: `/select-cloth-type/${item.title}`,
-      state: item.id,
+      state: { selectedGender, categoryId: item.id },
     });
     setIsTransitioning(true);
   };

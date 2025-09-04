@@ -9,6 +9,7 @@ export const AnimatedClothPicker = ({
   onItemClick,
 }) => {
   const [active, setActive] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleNext = () => {
     setActive((prev) => (prev + 1) % squareImages.length);
@@ -21,10 +22,30 @@ export const AnimatedClothPicker = ({
   const isActive = (index) => {
     return index === active;
   };
+
   const handleSelect = () => {
-    if (onItemClick) {
+    if (onItemClick && !isDragging) {
       onItemClick(squareImages[active]);
     }
+  };
+
+  // Handle swipe gestures
+  const handleDragEnd = (event, { offset, velocity }) => {
+    const swipe = swipePower(offset.x, velocity.x);
+
+    if (swipe < -swipeConfidenceThreshold) {
+      handleNext();
+    } else if (swipe > swipeConfidenceThreshold) {
+      handlePrev();
+    }
+    
+    // Reset dragging state after a short delay
+    setTimeout(() => setIsDragging(false), 100);
+  };
+
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset, velocity) => {
+    return Math.abs(offset) * velocity;
   };
 
   useEffect(() => {
@@ -42,9 +63,17 @@ export const AnimatedClothPicker = ({
     <div className="min-h-[80vh] w-full flex items-center justify-center px-4 md:px-8 lg:px-8 py-4">
       <div className="w-full max-w-7xl mx-auto">
         <div className="relative grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16 items-center">
-          {/* Image Section */}
+          {/* Image Section with Swipe Support */}
           <div className="flex justify-center">
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md xl:max-w-lg">
+            <motion.div 
+              className="relative w-full max-w-xs sm:max-w-sm md:max-w-md xl:max-w-lg cursor-grab active:cursor-grabbing"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={1}
+              onDragStart={() => setIsDragging(true)}
+              onDragEnd={handleDragEnd}
+              whileDrag={{ cursor: "grabbing" }}
+            >
               {/* Image container with proper 3:4 aspect ratio */}
               <div className="relative aspect-[3/4] p-3 md:p-4">
                 <AnimatePresence>
@@ -77,19 +106,41 @@ export const AnimatedClothPicker = ({
                         duration: 0.4,
                         ease: "easeInOut",
                       }}
-                      className="absolute bg-white rounded-2xl  inset-3 md:inset-4 origin-bottom z-0"
+                      className="absolute bg-white rounded-2xl inset-3 md:inset-4 origin-bottom z-0 select-none"
                     >
                       <img
                         src={BASE_URL + "/" + image.img}
                         alt={BASE_URL + "/" + image.img}
-                        className="h-full w-full rounded-2xl object-cover object-center shadow-lg"
+                        className="h-full w-full rounded-2xl object-cover object-center shadow-lg pointer-events-none"
                         draggable={false}
                       />
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
-            </div>
+              
+              {/* Swipe hint for mobile - only show on touch devices */}
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 md:hidden">
+                <motion.div
+                  className="flex items-center space-x-2 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1"
+                  initial={{ opacity: 0.7 }}
+                  animate={{ opacity: [0.7, 0.3, 0.7] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <motion.div
+                    className="w-2 h-2 bg-white/80 rounded-full"
+                    animate={{ x: [-4, 4, -4] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                  <span className="text-white/80 text-xs font-medium">Swipe</span>
+                  <motion.div
+                    className="w-2 h-2 bg-white/80 rounded-full"
+                    animate={{ x: [4, -4, 4] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Content Section */}
@@ -144,10 +195,8 @@ export const AnimatedClothPicker = ({
                     </motion.span>
                   ))
                   : null}
-
               </motion.h2>
 
-              {/* Description */}
               {/* Description */}
               <motion.p
                 className="text-lg md:text-xl opacity-80"
@@ -160,11 +209,10 @@ export const AnimatedClothPicker = ({
                   ? squareImages[active].description
                   : "Discover the perfect style for every occasion"}
               </motion.p>
-
             </motion.div>
 
             {/* Navigation Controls */}
-            <div className="flex items-center  justify-center gap-16">
+            <div className="flex items-center justify-center gap-16">
               {/* Previous Button */}
               <motion.button
                 onClick={handlePrev}
@@ -183,12 +231,26 @@ export const AnimatedClothPicker = ({
                 />
               </motion.button>
 
-
+              {/* Dots indicator */}
+              <div className="flex space-x-2">
+                {squareImages.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    className="w-2 h-2 rounded-full transition-all duration-300"
+                    style={{
+                      backgroundColor: isActive(index) ? "#2d1810" : "#e7d8bb",
+                    }}
+                    onClick={() => setActive(index)}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                  />
+                ))}
+              </div>
 
               {/* Next Button */}
               <motion.button
                 onClick={handleNext}
-                className="relative group h-16 w-16 md:h-20 md:w-20  flex items-center justify-center transition-all duration-300 hover:scale-110 hexagon-shape"
+                className="relative group h-16 w-16 md:h-20 md:w-20 flex items-center justify-center transition-all duration-300 hover:scale-110 hexagon-shape"
                 style={{ backgroundColor: "#e7d8bb" }}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}

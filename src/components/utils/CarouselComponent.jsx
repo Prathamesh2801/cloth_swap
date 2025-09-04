@@ -40,9 +40,7 @@ export default function Carousel({ items, onItemClick }) {
 
   return (
     <div className="mb-6">
-      <h3 className="text-3xl font-bold text-[#2d1810] mb-5 ml-5 bebas-neue-regular tracking-wide">
-        Recommended for You
-      </h3>
+     
       <div
         ref={containerRef}
         className="relative overflow-hidden"

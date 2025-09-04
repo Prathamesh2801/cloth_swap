@@ -14,7 +14,7 @@ import { ShirtIcon } from "lucide-react";
 export default function SelectClothTypeScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const categoryId = location.state
+  const { categoryId, selectedGender } = location.state
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextAction, setNextAction] = useState(null); // { type: "forward", path, state } or { type: "back" }
   const [clothTypes, setClothTypes] = useState([])
@@ -52,7 +52,7 @@ export default function SelectClothTypeScreen() {
     setNextAction({
       type: "forward",
       path: `/camera`,
-      state: { categoryId, typeId: item.id },
+      state: {selectedGender, categoryId, typeId: item.id },
     });
     setIsTransitioning(true);
   };
